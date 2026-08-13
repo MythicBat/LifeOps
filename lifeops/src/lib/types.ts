@@ -25,3 +25,20 @@ export interface Decision {
     primaryAction: string;
     secondaryAction: string;
 }
+
+export type IntakeStatus = 
+    | "idle"
+    | "uploading"
+    | "analyzing"
+    | "complete"
+    | "error";
+
+export interface IntakeResult {
+    id: string;
+    fileName: string;
+    fileType: string;
+    fileSize: number;
+    category: "document" | "image" | "unknown";
+    status: "received";
+    createdAt: string;
+}
