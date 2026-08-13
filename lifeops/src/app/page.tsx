@@ -3,6 +3,7 @@ import { DecisionCard } from "@/components/lifeops/DecisionCard";
 import { LifeOpsOrb } from "@/components/lifeops/LifeOpsOrb";
 import { StatCard } from "@/components/lifeops/StatCard";
 import { Sidebar } from "@/components/navigation/Sidebar";
+import { AddAnythingButton } from "@/components/lifeops/AddAnythingButton";
 
 import {
   pendingDecision,
@@ -11,7 +12,6 @@ import {
 
 import {
   ArrowRight,
-  Plus,
   Sparkles,
 } from "lucide-react";
 
@@ -37,11 +37,7 @@ export default function Home() {
               </p>
             </div>
 
-            <button className="flex h-11 items-center gap-2 rounded-full bg-zinc-950 px-5 text-sm font-medium text-white transition hover:bg-zinc-800">
-              <Plus size={17} />
-
-              Add anything
-            </button>
+            <AddAnythingButton />
           </header>
 
           <section className="mt-10 grid gap-6 lg:grid-cols-[1.15fr_0.85fr]">
