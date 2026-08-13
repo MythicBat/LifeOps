@@ -1,3 +1,5 @@
+import type { LifeOpsDocumentAnalysis } from "./document-intelligence";
+
 export type ActivityType = 
     | "bill"
     | "appointment"
@@ -39,6 +41,7 @@ export interface IntakeResult {
     fileType: string;
     fileSize: number;
     category: "document" | "image" | "unknown";
-    status: "received";
+    status: "received" | "analysed";
     createdAt: string;
+    analysis?: LifeOpsDocumentAnalysis;
 }

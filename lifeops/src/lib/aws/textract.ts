@@ -6,4 +6,4 @@ if (!region) {
     throw new Error("AWS_REGION is not configured.");
 }
 
-export const textractClient = new TextractClient({ region });
+export const textract = new TextractClient({ region });

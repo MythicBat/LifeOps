@@ -32,7 +32,7 @@ import type {
   IntakeStatus,
 } from "@/lib/types";
 
-import { uploadToLifeOps } from "@/lib/uploads";
+import { uploadToLifeOps, analyseLifeOpsDocument } from "@/lib/uploads";
 
 interface UniversalDropProps {
   open: boolean;
@@ -78,9 +78,7 @@ export function UniversalDrop({
       const uploaded = await uploadToLifeOps(selectedFile);
       setStatus("analyzing");
 
-      await new Promise((resolve) =>
-        setTimeout(resolve, 700),
-      );
+      const analysis = await analyseLifeOpsDocument(uploaded);
 
       setResult({
         id: uploaded.documentId,
@@ -90,6 +88,7 @@ export function UniversalDrop({
         category: selectedFile.type.startsWith("image/",) ? "image" : "document",
         status: "received",
         createdAt: new Date().toISOString(),
+        analysis,
       });
       setStatus("complete");
 
@@ -504,6 +503,8 @@ function CompleteState({
   onReset: () => void;
   onClose: () => void;
 }) {
+  const analysis = result.analysis;
+
   return (
     <div className="mt-8">
       <div className="rounded-[28px] border border-black/[0.05] bg-white p-7">
@@ -530,8 +531,8 @@ function CompleteState({
         </h3>
 
         <p className="mt-2 text-sm leading-6 text-zinc-500">
-          This file is ready to enter the
-          LifeOps intelligence pipeline.
+          LifeOps analyzed the document
+          and extracted the important information.
         </p>
 
         <div className="mt-7 rounded-[20px] bg-[#f5f5f7] p-5">
@@ -568,6 +569,55 @@ function CompleteState({
           </div>
         </div>
 
+        {analysis && (
+          <div className="mt-5 rounded-[22px] border border-black/[0.05] bg-white p-5">
+            <p className="text-xs font-medium uppercase tracking-[0.15em] text-zinc-400">LifeOps Understood</p>
+
+            <div className="mt-5 space-y-4">
+              {analysis.vendor && (
+                <AnalysisRow
+                  label="Provider"
+                  value={analysis.vendor}
+                />
+              )}
+
+              {analysis.total !== undefined && (
+                <AnalysisRow
+                  label="Amount"
+                  value={`$${analysis.total.toFixed(2)}`}
+                  strong
+                />
+              )}
+
+              {analysis.dueDate && (
+                <AnalysisRow
+                  label="Due"
+                  value={analysis.dueDate}
+                />
+              )}
+
+              {analysis.date && (
+                <AnalysisRow
+                  label="Date"
+                  value={analysis.date}
+                />
+              )}
+
+              {analysis.invoiceNumber && (
+                <AnalysisRow
+                  label="Reference"
+                  value={analysis.invoiceNumber}
+                />
+              )}
+              
+              <AnalysisRow
+                label="Detected as"
+                value={analysis.documentType}
+              />
+            </div>
+          </div>
+        )}
+
         <div className="mt-6 flex items-center gap-3 text-sm text-zinc-500">
           <div className="flex h-6 w-6 items-center justify-center rounded-full bg-zinc-100">
             <Check size={13} />
@@ -581,7 +631,7 @@ function CompleteState({
             <Check size={13} />
           </div>
 
-          Ready for AI analysis
+          Analyzed by Amazon Textract
         </div>
       </div>
 
@@ -600,6 +650,27 @@ function CompleteState({
           Done
         </button>
       </div>
+    </div>
+  );
+}
+
+function AnalysisRow({
+  label,
+  value,
+  strong = false
+}: {
+  label: string;
+  value: string;
+  strong?: boolean
+}) {
+  return (
+    <div className="flex items-center justify-between gap-5">
+      <span className="text-sm text-zinc-400">{label}</span>
+      <span className={
+        strong ? "text-base font-semibold text-zinc-950" : "text-sm font-medium text-zinc-800"
+      }>
+        {value}
+      </span>
     </div>
   );
 }

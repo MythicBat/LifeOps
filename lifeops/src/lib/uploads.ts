@@ -1,3 +1,5 @@
+import type { LifeOpsDocumentAnalysis } from "./document-intelligence";
+
 export interface UploadedDocument {
     documentId: string;
     objectKey: string;
@@ -53,4 +55,29 @@ export async function uploadToLifeOps(file: File): Promise<UploadedDocument> {
         documentId,
         objectKey,
     };
+}
+
+export async function analyseLifeOpsDocument(document: UploadedDocument): Promise<LifeOpsDocumentAnalysis> {
+    const response = await fetch("/api/documents/analyse",
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                documentId: document.documentId,
+                objectKey: document.objectKey,
+            }),
+        },
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        throw new Error(
+            data.detail ?? data.error ?? "Document analysis failed.",
+        );
+    }
+
+    return data.analysis;
 }
