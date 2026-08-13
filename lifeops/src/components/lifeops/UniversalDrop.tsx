@@ -32,6 +32,8 @@ import type {
   IntakeStatus,
 } from "@/lib/types";
 
+import { uploadToLifeOps } from "@/lib/uploads";
+
 interface UniversalDropProps {
   open: boolean;
   onClose: () => void;
@@ -72,41 +74,23 @@ export function UniversalDrop({
     setStatus("uploading");
 
     try {
-      const formData = new FormData();
 
-      formData.append(
-        "file",
-        selectedFile,
-      );
-
-      await new Promise((resolve) =>
-        setTimeout(resolve, 500),
-      );
-
+      const uploaded = await uploadToLifeOps(selectedFile);
       setStatus("analyzing");
-
-      const response = await fetch(
-        "/api/intake",
-        {
-          method: "POST",
-          body: formData,
-        },
-      );
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(
-          data.error ??
-            "Unable to process file.",
-        );
-      }
 
       await new Promise((resolve) =>
         setTimeout(resolve, 700),
       );
 
-      setResult(data);
+      setResult({
+        id: uploaded.documentId,
+        fileName: selectedFile.name,
+        fileType: selectedFile.type,
+        fileSize: selectedFile.size,
+        category: selectedFile.type.startsWith("image/",) ? "image" : "document",
+        status: "received",
+        createdAt: new Date().toISOString(),
+      });
       setStatus("complete");
 
       toast.success(
