@@ -5,6 +5,7 @@ from strands.models import (BedrockModel)
 from .models import (DocumentAnalysis)
 from .observer import (LifeOpsObserver)
 from .planner import (LifeOpsPlanner)
+from .guardian import (evaluate_plan)
 
 load_dotenv()
 
@@ -31,8 +32,10 @@ class LifeOpsService:
     def process_document(self, document: DocumentAnalysis):
         event = self.observer.observe(document)
         plan = self.planner.plan(event)
+        guardian = (evaluate_plan(plan))
 
         return {
             "event": event.model_dump(),
             "plan": plan.model_dump(),
+            "guardian": guardian.model_dump(),
         }
