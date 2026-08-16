@@ -57,7 +57,6 @@ def record_subscription(
         "id": subscription_id,
         "userId": user_id,
         "vendor": vendor,
-        "vendorKey": normalize_vendor(vendor),
         "userVendorKey": (f"{user_id}#"
                           f"{normalize_vendor(vendor)}"),
         "amount": amount,
