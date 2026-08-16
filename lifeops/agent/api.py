@@ -4,6 +4,7 @@ import boto3
 from boto3.dynamodb.conditions import Attr
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
 
 from lifeops.models import DocumentAnalysis
 from lifeops.service import LifeOpsService
@@ -20,6 +21,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+class ResolveDecisionRequest(BaseModel):
+    option: str
 
 region = os.getenv("AWS_REGION")
 dynamodb = boto3.resource("dynamodb", region_name=region)
@@ -74,3 +78,39 @@ def process_document(document: DocumentAnalysis):
             status_code=500,
             detail=str(error),
         )
+
+@app.post("/decisions/{decision_id}/resolve")
+def resolve_decision(decision_id: str, request: ResolveDecisionRequest):
+    table_name = os.getenv("DYNAMODB_DECISIONS_TABLE")
+
+    if not table_name:
+        raise HTTPException(status_code=500, detail=("Decision table is not configured"))
+
+    table = dynamodb.Table(table_name)
+
+    response = table.update_item(
+        Key={
+            "id": decision_id
+        },
+        UpdateExpression=(
+            "SET #status = :status, "
+            "selectedOption = :option, "
+            "resolvedAt = :resolved"
+        ),
+        ExpressionAttributeNames={
+            "#status": "status",
+        },
+        ExpressionAttributeValues={
+            ":status": "resolved",
+            ":option": request.option,
+            ":resolved": __import__("datetime").datetime.now(
+                __import__("datetime").timezone.utc
+            ).isoformat(),
+        },
+        ReturnValues="ALL_NEW",
+    )
+
+    return {
+        "success": True,
+        "decision": response.get("Attributes"),
+    }
