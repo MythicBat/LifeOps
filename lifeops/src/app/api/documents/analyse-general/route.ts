@@ -1,6 +1,7 @@
 import { AnalyzeDocumentCommand } from "@aws-sdk/client-textract";
 import { NextResponse } from "next/server";
 import { textract } from "@/lib/aws/textract";
+import { extractQueryResults } from "@/lib/aws/normalise-document";
 
 export async function POST(request: Request) {
     try {
@@ -54,11 +55,13 @@ export async function POST(request: Request) {
         });
 
         const response = await textract.send(command);
+        const queryResults = extractQueryResults(response.Blocks ?? []);
 
         return NextResponse.json({
             success: true,
             documentId,
             objectKey,
+            queryResults,
             blocks: response.Blocks ?? [],
         });
     } catch (error) {
