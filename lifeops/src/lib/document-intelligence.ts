@@ -18,4 +18,11 @@ export interface LifeOpsDocumentAnalysis {
     accountNumber?: string;
     fields: ExtractedField[];
     rawFieldCount: number;
+    productName?: string;
+    appointmentDate?: string;
+    startTime?: string;
+    endTime?: string;
+    location?: string;
+    renewalDate?: string;
+    expiryDate?: string;
 }
