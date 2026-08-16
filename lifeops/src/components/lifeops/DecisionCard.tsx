@@ -9,6 +9,10 @@ export function DecisionCard({decision, onResolved,}: { decision: LifeOpsDecisio
 
   const amount = decision.metadata?.amount;
 
+  const previousAmount = decision.metadata?.previousAmount;
+  const annualImpact = decision.metadata?.annualImpact;
+  const percentageChange = decision.metadata?.percentageChange;
+
   const resolve = async (option: string) => {
     const response = await fetch(`/api/decisions/${decision.id}/resolve`,
       {
@@ -44,12 +48,42 @@ export function DecisionCard({decision, onResolved,}: { decision: LifeOpsDecisio
           <div className="rounded-full bg-amber-50 px-3 py-1.5 text-xs font-medium text-amber-700">Needs you</div>
         </div>
 
-        {vendor && amount !== undefined && (
-          <div className="mt-7">
-            <p className="text-sm text-zinc-400">Current charge</p>
+        {vendor && (
+          <>
+            {previousAmount !== undefined && amount !== undefined ? (
+              <div className="mt-7">
+                <p className="text-sm text-zinc-400">Monthyl price</p>
 
-            <p className="mt-1 text-[32px] font-semibold tracking-[-0.05em] text-zinc-950">${Number(amount).toFixed(2)}</p>
-          </div>
+                <div className="mt-2 flex items-end gap-3">
+                  <span className="text-xl text-zinc-400 line-through">${Number(previousAmount).toFixed(2)}</span>
+
+                  <span className="text-[32px] font-semibold tracking-[-0.05em] text-zinc-950">${Number(amount).toFixed(2)}</span>
+
+                  {percentageChange !== undefined && (
+                    <span className="mb-1 rounded-full bg-amber-50 px-2.5 py-1 text-xs font-medium text-amber-700">
+                      {percentageChange > 0 ? "+" : ""}
+                      {Number(percentageChange).toFixed(1)}%
+                    </span>
+                  )}
+                </div>
+
+                {annualImpact !== undefined && (
+                  <p className="mt-2 text-sm text-zinc-400">
+                    {annualImpact > 0 ? "+" : ""}
+                    ${Number(annualImpact).toFixed(2)}/year
+                  </p>
+                )}
+              </div>
+            ) : (amount !== undefined && (
+              <div className="mt-7">
+                <p className="text-sm text-zinc-400">Current charge</p>
+
+                <p className="mt-1 text-[32px] font-semibold tracking-[-0.05em] text-zinc-950">
+                  ${Number(amount).toFixed(2)}
+                </p>
+              </div>
+            ))}
+          </>
         )}
 
         <p className="mt-5 max-w-lg text-sm leading-6 text-zinc-500">{decision.description}</p>

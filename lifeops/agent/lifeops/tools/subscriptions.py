@@ -1,5 +1,5 @@
 from decimal import Decimal
-from boto3.dynamodb.conditions import Attr
+from boto3.dynamodb.conditions import Key
 
 from ..database import (
     clean_for_dynamodb,
@@ -22,27 +22,25 @@ def find_latest_subscription(
 ) -> dict | None:
     table = get_table("DYNAMODB_SUBSCRIPTIONS_TABLE")
 
-    normalized_vendor = (normalize_vendor(vendor))
+    user_vendor_key = (
+        f"{user_id}#"
+        f"{normalize_vendor(vendor)}"
+    )
 
-    response = table.scan(
-        FilterExpression=(
-            Attr("userId").eq(user_id) &
-            Attr("vendorKey").eq(normalized_vendor)
-        )
+    response = table.query(
+        IndexName=("UserVendorCreatedAtIndex"),
+        KeyConditionExpression=(
+            Key("userVendorKey").eq(user_vendor_key)
+        ),
+        ScanIndexForward=False,
+        Limit=1,
     )
 
     items = response.get("Items", [])
 
-    if not items:
-        return None
-
-    items.sort(
-        key=lambda item:
-            item.get("createdAt", ""),
-        reverse=True,
+    return (
+        items[0] if items else None
     )
-
-    return items[0]
 
 def record_subscription(
         user_id: str,
@@ -60,6 +58,8 @@ def record_subscription(
         "userId": user_id,
         "vendor": vendor,
         "vendorKey": normalize_vendor(vendor),
+        "userVendorKey": (f"{user_id}#"
+                          f"{normalize_vendor(vendor)}"),
         "amount": amount,
         "currency": currency or "AUD",
         "documentId": document_id,

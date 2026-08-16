@@ -10,7 +10,11 @@ export interface LifeOpsDecision {
         vendor?: string;
         amount?: number;
         previousAmount?: number;
+        monthlyDifference?: number;
         annualImpact?: number;
+        percentageChange?: number;
+        sourceDocumentId?: string;
+
     };
     createdAt: string;
 }
