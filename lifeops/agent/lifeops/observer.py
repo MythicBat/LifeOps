@@ -11,6 +11,7 @@ from .prompts import (
     OBSERVER_PROMPT,
 )
 
+from .tools.subscriptions import (find_latest_subscription)
 
 class LifeOpsObserver:
     def __init__(

@@ -7,6 +7,11 @@ from .observer import (LifeOpsObserver)
 from .planner import (LifeOpsPlanner)
 from .guardian import (evaluate_plan)
 from .executor import (LifeOpsExecutor)
+from .tools.subscriptions import (
+    analyse_subscription_change,
+    find_latest_subscription,
+    record_subscription,
+)
 
 load_dotenv()
 
@@ -33,6 +38,7 @@ class LifeOpsService:
 
     def process_document(self, document: DocumentAnalysis, user_id: str = "demo-user"):
         event = self.observer.observe(document)
+        subscription_change = None
         plan = self.planner.plan(event)
         guardian = (evaluate_plan(plan))
         execution = (
@@ -43,6 +49,34 @@ class LifeOpsService:
                 guardian=guardian,
             )
         )
+
+        if (document.vendor and document.total):
+            vendor_lower = (document.vendor.lower())
+
+            known_subscriptions = [
+                "spotify",
+                "netflix",
+                "disney",
+                "youtube",
+                "amazon prime",
+                "notion",
+                "adobe",
+                "dropbox",
+                "icloud",
+            ]
+
+            is_subscription = any(vendor in vendor_lower for vendor in known_subscriptions)
+
+            if is_subscription:
+                previous = (find_latest_subscription(user_id=user_id, vendor=document.vendor))
+                subscription_change = (analyse_subscription_change(previous=previous, current_amount=document.total))
+                record_subscription(
+                    user_id=user_id,
+                    vendor=document.vendor,
+                    amount=document.total,
+                    currency=document.currency,
+                    document_id=document.documentId,
+                )
 
         return {
             "event": event.model_dump(),
