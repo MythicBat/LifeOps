@@ -12,6 +12,13 @@ class DocumentAnalysis(BaseModel):
     date: Optional[str] = None
     dueDate: Optional[str] = None
     accountNumber: Optional[str] = None
+    productName: Optional[str] = None
+    appointmentDate: Optional[str] = None
+    startTime: Optional[str] = None
+    endTime: Optional[str] = None
+    location: Optional[str] = None
+    renewalDate: Optional[str] = None
+    expiryDate: Optional[str] = None
 
 class ObservedEvent(BaseModel):
     eventType: Literal[
