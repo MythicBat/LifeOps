@@ -37,6 +37,8 @@ class PlannedAction(BaseModel):
         "archive_receipt",
         "track_subscription",
         "track_warranty",
+        "track_renewal",
+        "add_appointment",
         "create_decision",
         "no_action",
     ]
