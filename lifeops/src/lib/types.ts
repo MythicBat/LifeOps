@@ -1,4 +1,5 @@
 import type { LifeOpsDocumentAnalysis } from "./document-intelligence";
+import type { AgentProcessingResult } from "./agent";
 
 export type ActivityType = 
     | "bill"
@@ -41,7 +42,8 @@ export interface IntakeResult {
     fileType: string;
     fileSize: number;
     category: "document" | "image" | "unknown";
-    status: "received" | "analysed";
+    status: "received" | "analysed" | "handled";
     createdAt: string;
     analysis?: LifeOpsDocumentAnalysis;
+    agentResult?: AgentProcessingResult;
 }

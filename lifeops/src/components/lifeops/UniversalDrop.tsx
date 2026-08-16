@@ -33,6 +33,7 @@ import type {
 } from "@/lib/types";
 
 import { uploadToLifeOps, analyseLifeOpsDocument } from "@/lib/uploads";
+import { processWithLifeOpsAgent } from "@/lib/agent";
 
 interface UniversalDropProps {
   open: boolean;
@@ -79,6 +80,7 @@ export function UniversalDrop({
       setStatus("analyzing");
 
       const analysis = await analyseLifeOpsDocument(uploaded);
+      const agentResult = await processWithLifeOpsAgent(analysis);
 
       setResult({
         id: uploaded.documentId,
@@ -86,9 +88,10 @@ export function UniversalDrop({
         fileType: selectedFile.type,
         fileSize: selectedFile.size,
         category: selectedFile.type.startsWith("image/",) ? "image" : "document",
-        status: "received",
+        status: "handled",
         createdAt: new Date().toISOString(),
         analysis,
+        agentResult,
       });
       setStatus("complete");
 
