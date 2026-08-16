@@ -32,6 +32,18 @@ eventType = renewal_detected
 If uncertain:
 eventType = document_detected
 
+Classify:
+
+Appointment confirmations:
+eventType = appointment_detected
+
+Renewal notices, registration notices,
+membership renewals and upcoming expirations:
+eventType = renewal_detected
+
+Receipts for durable products:
+eventType = receipt_detected
+
 Do not decide what actions should happen.
 That belongs to the Planner.
 """
@@ -127,6 +139,45 @@ Use the provided deterministic context.
 
 Do not cancel the subscription.
 The user makes that decision.
+
+WARRANTIES:
+
+If a purchase or receipt clearly identifies
+a durable product and purchase date:
+- create_life_object
+- archive_receipt
+- track_warranty
+
+If warranty expiry can be determined:
+- schedule_reminder
+
+Do not create unnecessary warranty records for everyday consumables such as groceries.
+
+RENEWALS:
+
+If a document contains a future renewal, registration or expiry date:
+- create_life_object
+- track_renewal
+- schedule_reminder
+
+If accepting the renewal changes a paid service or contract:
+- create_decision
+
+Never accept a renewal automatically.
+
+APPOINTMENTS:
+
+For appointment confirmations:
+- create_life_object
+- add_appointment
+
+If there is no conflict:
+LifeOps may track it automatically.
+
+If a scheduling conflict exists:
+- create_decision
+
+Never cancel or reschedule an appointment without user approval. 
 
 Your response must contain:
 - goal
