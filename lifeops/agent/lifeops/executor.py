@@ -11,6 +11,7 @@ from .tools.life_objects import (create_life_object)
 from .tools.obligations import (create_obligation)
 from .tools.runs import (record_agent_run)
 from .tools.reminders import (schedule_reminder)
+from .tools.decisions import (create_decision)
 
 class LifeOpsExecutor:
     def execute(self, user_id: str, document: DocumentAnalysis, plan: LifeOpsPlan, guardian: GuardianDecision) -> dict:
@@ -98,6 +99,29 @@ class LifeOpsExecutor:
                     "result": result,
                 })
 
+            # CREATE DECISIONS
+            elif action.type == "create_decision":
+                decision = create_decision(
+                    user_id=user_id,
+                    title=self._decision_title(document),
+                    description=self._decision_description(document,plan),
+                    category=("subscription" if (document.vendor and self._looks_like_subscription(document.vendor)) else "document"),
+                    options=[
+                        "Keep",
+                        "Review",
+                    ],
+                    metadata={
+                        "vendor": document.vendor,
+                        "amount": document.total,
+                        "sourceDocumentId": document.documentId,
+                    },
+                )
+
+                results.append({
+                    "action": action.type,
+                    "result": decision,
+                })
+
         # RECORD AGENT RUN
         run = record_agent_run(
             user_id=user_id,
@@ -174,4 +198,41 @@ class LifeOpsExecutor:
         return reminder.strftime(
             "%Y-%m-%dT%H:%M:%S"
         )
+
+    def _looks_like_subscription(self, vendor: str) -> bool:
+        known = {
+            "spotify",
+            "netflix",
+            "disney",
+            "youtube",
+            "amazon prime",
+            "apple",
+            "adobe",
+            "notion",
+            "dropbox",
+        }
+
+        lowered = vendor.lower()
+
+        return any(
+            name in lowered for name in known
+        )
+
+    def _decision_tite(self, document: DocumentAnalysis) -> str:
+        if document.vendor:
+            return (
+                f"Review "
+                f"{document.vendor}"
+            )
+        return "Review this item"
+
+    def _decision_decsription(self, document: DocumentAnalysis, plan: LifeOpsPlan) -> str:
+        if (document.vendor and document.total):
+            return (
+                f"{document.vendor} is "
+                f"${document.total:.2f}. "
+                f"{plan.briefing}"
+            )
+        
+        return plan.briefing
             

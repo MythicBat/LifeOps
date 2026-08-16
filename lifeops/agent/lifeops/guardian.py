@@ -18,11 +18,8 @@ AUTO_ACTIONS = {
     "archive_receipt",
     "track_subscription",
     "track_warranty",
-    "no_action",
-}
-
-DECISION_ACTIONS = {
     "create_decision",
+    "no_action",
 }
 
 HIGH_RISK_ACTIONS = {
@@ -45,11 +42,11 @@ def evaluate_plan(plan: LifeOpsPlan) -> GuardianDecision:
             reason=("The plan contains " "a consequential action."),
         )
 
-    if (action_types & DECISION_ACTIONS):
+    if ("create_decision" in action_types):
         return GuardianDecision(
             level="decision",
-            permitted=False,
-            reason=("The user needs to " "make a decision."),
+            permitted=True,
+            reason=("LifeOps may prepare this decision, but the user must choose the outcome."),
         )
 
     if action_types.issubset(AUTO_ACTIONS):
