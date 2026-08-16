@@ -53,6 +53,7 @@ class LifeOpsService:
                 document=document,
                 plan=plan,
                 guardian=guardian,
+                context=planner_context,
             )
         )
 
@@ -89,4 +90,5 @@ class LifeOpsService:
             "plan": plan.model_dump(),
             "guardian": guardian.model_dump(),
             "execution": execution,
+            "intelligence": {"subscription", subscription_change}
         }

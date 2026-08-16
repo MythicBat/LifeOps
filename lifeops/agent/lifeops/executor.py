@@ -14,7 +14,16 @@ from .tools.reminders import (schedule_reminder)
 from .tools.decisions import (create_decision)
 
 class LifeOpsExecutor:
-    def execute(self, user_id: str, document: DocumentAnalysis, plan: LifeOpsPlan, guardian: GuardianDecision) -> dict:
+    def execute(
+            self, 
+            user_id: str, 
+            document: DocumentAnalysis, 
+            plan: LifeOpsPlan, 
+            guardian: GuardianDecision,
+            context: dict | None = None,
+        ) -> dict:
+        context = context or {}
+
         if not guardian.permitted:
             return {
                 "executed": False,
@@ -101,6 +110,8 @@ class LifeOpsExecutor:
 
             # CREATE DECISIONS
             elif action.type == "create_decision":
+                subscription = (context.get("subscription", {}))
+
                 decision = create_decision(
                     user_id=user_id,
                     title=self._decision_title(document),
@@ -113,6 +124,10 @@ class LifeOpsExecutor:
                     metadata={
                         "vendor": document.vendor,
                         "amount": document.total,
+                        "previousAmount": subscription.get("previousAmount"),
+                        "monthlyDifference": subscription.get("monthlyDifference"),
+                        "annualImpact": subscription.get("annualImpact"),
+                        "percentageChange": subscription.get("percentageChange"),
                         "sourceDocumentId": document.documentId,
                     },
                 )
