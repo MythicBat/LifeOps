@@ -1,0 +1,76 @@
+from decimal import Decimal
+from boto3.dynamodb.conditions import Attr
+
+from ..database import (
+    clean_for_dynamodb,
+    get_table,
+    new_id,
+    utc_now
+)
+
+def normalize_vendor(vendor:str) -> str:
+    return (
+        vendor.strip().lower()
+            .replace(" premium", "")
+            .replace(" pty ltd", "")
+            .replace(" ltd", "")
+    )
+
+def find_latest_subscription(
+        user_id: str,
+        vendor: str,
+) -> dict | None:
+    table = get_table("DYNAMODB_SUBSCRIPTIONS_TABLE")
+
+    normalized_vendor = (normalize_vendor(vendor))
+
+    response = table.scan(
+        FilterExpression=(
+            Attr("userId").eq(user_id) &
+            Attr("vendorKey").eq(normalized_vendor)
+        )
+    )
+
+    items = response.get("Items", [])
+
+    if not items:
+        return None
+
+    items.sort(
+        key=lambda item:
+            item.get("createdAt", ""),
+        reverse=True,
+    )
+
+    return items[0]
+
+def record_subscription(
+        user_id: str,
+        vendor: str,
+        amount: float,
+        currency: str | None = None,
+        document_id: str | None = None,
+) -> dict:
+    table = get_table("DYNAMODB_SUBSCRIPTIONS_TABLE")
+
+    subscription_id = new_id("sub")
+
+    item = {
+        "id": subscription_id,
+        "userId": user_id,
+        "vendor": vendor,
+        "vendorKey": normalize_vendor(vendor),
+        "amount": amount,
+        "currency": currency or "AUD",
+        "documentId": document_id,
+        "createdAt": utc_now(),
+    }
+
+    table.put_item(
+        Item=clean_for_dynamodb(item)
+    )
+
+    return {
+        "success": True,
+        "subscriptionId": subscription_id,
+    }
