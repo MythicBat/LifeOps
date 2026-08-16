@@ -39,7 +39,13 @@ class LifeOpsService:
     def process_document(self, document: DocumentAnalysis, user_id: str = "demo-user"):
         event = self.observer.observe(document)
         subscription_change = None
-        plan = self.planner.plan(event)
+
+        planner_context = {}
+        
+        if subscription_change:
+            planner_context["subscription"] = subscription_change
+        plan = self.planner.plan(event, context=planner_context)
+
         guardian = (evaluate_plan(plan))
         execution = (
             self.executor.execute(

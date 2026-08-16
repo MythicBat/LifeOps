@@ -14,11 +14,15 @@ class LifeOpsPlanner:
             system_prompt=PLANNER_PROMPT,
         )
 
-    def plan(self, event: ObservedEvent) -> LifeOpsPlan:
+    def plan(self, event: ObservedEvent, context: dict | None = None) -> LifeOpsPlan:
         prompt = f"""
 Create a LifeOps action plan for:
 
+EVENT:
 {event.model_dump_json(indent=2)}
+
+ADDITIONAL CONTEXT:
+{json.dumps(context or {}, indent=2)}
 
 Return only valid JSON matching:
 
