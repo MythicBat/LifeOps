@@ -1,9 +1,9 @@
 import { ActivityFeed } from "@/components/lifeops/ActivityFeed";
-import { DecisionCard } from "@/components/lifeops/DecisionCard";
 import { LifeOpsOrb } from "@/components/lifeops/LifeOpsOrb";
 import { StatCard } from "@/components/lifeops/StatCard";
 import { Sidebar } from "@/components/navigation/Sidebar";
 import { AddAnythingButton } from "@/components/lifeops/AddAnythingButton";
+import { DecisionFeed } from "@/components/lifeops/DecisionFeed";
 
 import {
   pendingDecision,
@@ -95,21 +95,7 @@ export default function Home() {
             </div>
           </section>
 
-          <section className="mt-12">
-            <div className="mb-5 flex items-center justify-between">
-              <div>
-                <p className="text-xs font-medium uppercase tracking-[0.15em] text-zinc-400">
-                  Needs you
-                </p>
-
-                <h2 className="mt-1 text-xl font-semibold tracking-tight text-zinc-950">
-                  One decision
-                </h2>
-              </div>
-            </div>
-
-            <DecisionCard decision={pendingDecision} />
-          </section>
+          <DecisionFeed />
 
           <section className="mt-12 pb-16">
             <div className="mb-5 flex items-end justify-between">
