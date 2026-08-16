@@ -80,6 +80,7 @@ export function UniversalDrop({
       setStatus("analyzing");
 
       const analysis = await analyseLifeOpsDocument(uploaded);
+      setStatus("acting");
       const agentResult = await processWithLifeOpsAgent(analysis);
 
       setResult({
@@ -461,7 +462,7 @@ function ProcessingState({
       <p className="mt-6 text-lg font-medium tracking-tight text-zinc-950">
         {status === "uploading"
           ? "Taking it in..."
-          : "Understanding what this is..."}
+          : status === "analyzing" ? "Understanding what this is..." : "Taking care of it..."}
       </p>
 
       <p className="mt-2 max-w-sm truncate text-sm text-zinc-400">
@@ -489,7 +490,7 @@ function ProcessingState({
       <p className="mt-4 text-xs text-zinc-400">
         {status === "uploading"
           ? "Receiving securely"
-          : "Preparing for LifeOps analysis"}
+          : status === "analyzing" ? "Reading with Amazon Textract" : "Planning and executing safe actions"}
       </p>
     </div>
   );
@@ -507,6 +508,7 @@ function CompleteState({
   onClose: () => void;
 }) {
   const analysis = result.analysis;
+  const agentResult = result.agentResult;
 
   return (
     <div className="mt-8">
@@ -621,6 +623,46 @@ function CompleteState({
           </div>
         )}
 
+        {agentResult && (
+          <div className="mt-5 rounded-[22px] border border-black/[0.05] bg-zinc-950 p-6 text-white">
+            <p className="text-xs font-medium uppercase tracking-[0.15em] text-white/40">LifeOps handled</p>
+
+            <h4 className="mt-3 text-lg font-medium tracking-tight">{agentResult.event.title}</h4>
+
+            <p className="mt-2 text-sm leading-6 text-white/60">{agentResult.plan.briefing}</p>
+
+            <div className="mt-5 flex items-center gap-2">
+              <span className="rounded-full bg-white/10 px-3 py-1.5 text-xs font-medium text-white/70">
+                {agentResult.guardian.level === "auto"
+                  ? "Autonomously handled" : agentResult.guardian.level === "decision"
+                  ? "Decision required" : "Confirmation required"
+                }
+              </span>
+
+              <span className="text-xs text-white/35">Guardian</span>
+            </div>
+
+            <div className="mt-6 space-y-3">
+              {agentResult.plan.actions.map((action) => (
+                <div
+                  key={action.type}
+                  className="flex items-start gap-3"
+                >
+                  <div className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-white text-zinc-950">
+                    <Check size={11} />
+                  </div>
+
+                  <div>
+                    <p className="text-sm font-medium">{formatActionName(action.type)}</p>
+
+                    <p className="mt-0.5 text-xs leading-5 text-white/40">{action.reason}</p>
+                  </div>
+                </div>
+              ),)}
+            </div>
+          </div>
+        )}
+
         <div className="mt-6 flex items-center gap-3 text-sm text-zinc-500">
           <div className="flex h-6 w-6 items-center justify-center rounded-full bg-zinc-100">
             <Check size={13} />
@@ -655,6 +697,10 @@ function CompleteState({
       </div>
     </div>
   );
+}
+
+function formatActionName(action: string): string {
+  return action.replaceAll("_", " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
 }
 
 function AnalysisRow({

@@ -33,6 +33,7 @@ export type IntakeStatus =
     | "idle"
     | "uploading"
     | "analyzing"
+    | "acting"
     | "complete"
     | "error";
 
