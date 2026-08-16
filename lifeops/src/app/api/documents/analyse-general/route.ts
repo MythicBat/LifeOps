@@ -26,7 +26,31 @@ export async function POST(request: Request) {
                     Name: objectKey,
                 },
             },
-            FeatureTypes: ["FORMS", "TABLES", "LAYOUT"],
+            FeatureTypes: ["FORMS", "TABLES", "LAYOUT", "QUERIES"],
+            QueriesConfig: {
+                Queries: [
+                    {
+                        Text: "What is the appointment date?",
+                        Alias: "APPOINTMENT_DATE",
+                    },
+                    {
+                        Text: "What is the appointment time?",
+                        Alias: "APPOINTMENT_TIME",
+                    },
+                    {
+                        Text: "What is the renewal date?",
+                        Alias: "RENEWAL_DATE",
+                    },
+                    {
+                        Text: "What is the expiry date?",
+                        Alias: "EXPIRY_DATE",
+                    },
+                    {
+                        Text: "What is the location?",
+                        Alias: "LOCATION",
+                    },
+                ],
+            },
         });
 
         const response = await textract.send(command);
