@@ -52,3 +52,17 @@ class LifeOpsPlan(BaseModel):
     requiresUser: bool
     actions: list[PlannedAction]
     briefing: str
+
+class DecisionProposal(BaseModel):
+    title: str
+    description: str
+    category: Literal[
+        "subscription",
+        "renewal",
+        "appointment",
+        "purchase",
+        "document",
+        "other",
+    ]
+    recommendedAction: Optional[str] = None
+    options: list[str] = Field(default_factory=list)
