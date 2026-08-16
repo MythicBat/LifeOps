@@ -74,3 +74,33 @@ def record_subscription(
         "success": True,
         "subscriptionId": subscription_id,
     }
+
+def analyse_subscription_change(
+        previous: dict | None,
+        current_amount: float,
+) -> dict:
+    if not previous:
+        return {
+            "hasHistory": False,
+            "changed": False,
+            "previousAmount": None,
+            "currentAmount": current_amount,
+            "monthlyDifference": None,
+            "annualImpact": None,
+            "precentageChange": None,
+        }
+
+    previous_amount = float(previous["amount"])
+    difference = (current_amount - previous_amount)
+    changed = abs(difference) >= 0.01
+    percentage = ((difference/previous_amount)*100 if previous_amount else 0)
+
+    return {
+        "hasHistory": True,
+        "changed": changed,
+        "previousAmount": round(previous_amount, 2),
+        "currentAmount": round(current_amount, 2),
+        "monthlyDifference": round(difference, 2),
+        "annualImpact": round(difference * 12, 2),
+        "percentageChange": round(percentage, 1),
+    }
