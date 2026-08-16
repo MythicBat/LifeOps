@@ -30,6 +30,9 @@ export function DecisionFeed() {
                     <DecisionCard
                         key={decision.id}
                         decision={decision}
+                        onResolved={() => {
+                            setDecisions((current) => current.filter((item) => item.id !== decision.id));
+                        }}
                     />
                 ))}
             </div>

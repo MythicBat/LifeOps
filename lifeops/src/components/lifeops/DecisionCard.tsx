@@ -4,10 +4,28 @@ import { ArrowUpRight, Sparkles } from "lucide-react";
 
 import type { LifeOpsDecision } from "@/lib/decisions";
 
-export function DecisionCard({decision}: { decision: LifeOpsDecision; }) {
+export function DecisionCard({decision, onResolved,}: { decision: LifeOpsDecision; onResolved?: () => void; }) {
   const vendor = decision.metadata?.vendor;
 
   const amount = decision.metadata?.amount;
+
+  const resolve = async (option: string) => {
+    const response = await fetch(`/api/decisions/${decision.id}/resolve`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({option}),
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Could not resolve decision");
+    }
+
+    onResolved?.();
+  };
 
   return (
     <div className="overflow-hidden rounded-[28px] border border-black/[0.06] bg-white shadow-[0_20px_60px_rgba(0,0,0,0.06)]">
@@ -39,12 +57,16 @@ export function DecisionCard({decision}: { decision: LifeOpsDecision; }) {
 
       <div className="border-t border-black/[0.05] bg-[#fafafa] p-3">
         <div className="grid grid-cols-2 gap-2">
-          <button className="rounded-[16px] bg-white px-4 py-3 text-sm font-medium text-zinc-700 shadow-sm ring-1 ring-black/[0.05] transition hover:bg-zinc-50">
-            Keep
+          <button
+            onClick={() => resolve("Keep")}
+            className="rounded-[16px] bg-white px-4 py-3 text-sm font-medium text-zinc-700 shadow-sm ring-1 ring-black/[0.05] transition hover:bg-zinc-50">
+              Keep
           </button>
 
-          <button className="flex items-center justify-center gap-2 rounded-[16px] bg-zinc-950 px-4 py-3 text-sm font-medium text-white transition hover:bg-zinc-800">
-            Review
+          <button
+            onClick={() => resolve("Review")}
+            className="flex items-center justify-center gap-2 rounded-[16px] bg-zinc-950 px-4 py-3 text-sm font-medium text-white transition hover:bg-zinc-800">
+              Review
 
             <ArrowUpRight size={14} />
           </button>
