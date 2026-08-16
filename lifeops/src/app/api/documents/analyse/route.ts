@@ -1,4 +1,5 @@
 import {
+  AnalyzeDocumentCommand,
   AnalyzeExpenseCommand,
 } from "@aws-sdk/client-textract";
 
