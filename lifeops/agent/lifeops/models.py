@@ -66,3 +66,12 @@ class DecisionProposal(BaseModel):
     ]
     recommendedAction: Optional[str] = None
     options: list[str] = Field(default_factory=list)
+
+class SubscriptionChange(BaseModel):
+    hasHistory: bool
+    changed: bool
+    previousAmount: Optional[float] = None
+    currentAmount: Optional[float] = None
+    monthlyDifference: Optional[float] = None
+    annualImpact: Optional[float] = None
+    percentageChange: Optional[float] = None
