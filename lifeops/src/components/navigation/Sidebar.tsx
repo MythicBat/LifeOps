@@ -9,27 +9,35 @@ import {
   Vault,
 } from "lucide-react";
 
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+
 const navigation = [
   {
     label: "Home",
     icon: Home,
-    active: true,
+    href: "/",
   },
   {
     label: "Activity",
     icon: Activity,
+    href: "/activity",
   },
   {
     label: "Vault",
     icon: Vault,
+    href: "/vault",
   },
   {
     label: "Upcoming",
     icon: CalendarDays,
+    href: "/upcoming",
   },
 ];
 
 export function Sidebar() {
+  const pathname = usePathname();
+
   return (
     <aside className="hidden h-screen w-[250px] shrink-0 border-r border-black/[0.06] bg-white/60 px-4 py-6 backdrop-blur-xl lg:flex lg:flex-col">
       <div className="px-3">
@@ -55,10 +63,11 @@ export function Sidebar() {
           const Icon = item.icon;
 
           return (
-            <button
+            <Link
               key={item.label}
+              href={item.href}
               className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition ${
-                item.active
+                pathname === item.href
                   ? "bg-zinc-950 text-white shadow-sm"
                   : "text-zinc-500 hover:bg-zinc-100 hover:text-zinc-950"
               }`}
@@ -66,7 +75,7 @@ export function Sidebar() {
               <Icon size={17} strokeWidth={1.8} />
 
               {item.label}
-            </button>
+            </Link>
           );
         })}
       </nav>
