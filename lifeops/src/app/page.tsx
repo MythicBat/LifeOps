@@ -1,9 +1,9 @@
 import { ActivityFeed } from "@/components/lifeops/ActivityFeed";
 import { LifeOpsOrb } from "@/components/lifeops/LifeOpsOrb";
-import { StatCard } from "@/components/lifeops/StatCard";
 import { Sidebar } from "@/components/navigation/Sidebar";
 import { AddAnythingButton } from "@/components/lifeops/AddAnythingButton";
 import { DecisionFeed } from "@/components/lifeops/DecisionFeed";
+import { LiveOverview } from "@/components/lifeops/LiveOverview";
 
 import {
   pendingDecision,
@@ -72,27 +72,7 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <StatCard
-                value="3h 42m"
-                label="Estimated time saved"
-              />
-
-              <StatCard
-                value="31"
-                label="Tasks automated"
-              />
-
-              <StatCard
-                value="$126"
-                label="Savings identified"
-              />
-
-              <StatCard
-                value="24"
-                label="Decisions avoided"
-              />
-            </div>
+            <LiveOverview />
           </section>
 
           <DecisionFeed />
