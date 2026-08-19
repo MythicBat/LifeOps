@@ -1,14 +1,9 @@
-import { ActivityFeed } from "@/components/lifeops/ActivityFeed";
 import { LifeOpsOrb } from "@/components/lifeops/LifeOpsOrb";
 import { Sidebar } from "@/components/navigation/Sidebar";
 import { AddAnythingButton } from "@/components/lifeops/AddAnythingButton";
 import { DecisionFeed } from "@/components/lifeops/DecisionFeed";
 import { LiveOverview } from "@/components/lifeops/LiveOverview";
-
-import {
-  pendingDecision,
-  recentActivity,
-} from "@/lib/mock-data";
+import { LiveActivityFeed } from "@/components/lifeops/LiveActivityFeed";
 
 import {
   ArrowRight,
@@ -94,7 +89,7 @@ export default function Home() {
               </button>
             </div>
 
-            <ActivityFeed items={recentActivity} />
+            <LiveActivityFeed />
           </section>
         </div>
       </section>
