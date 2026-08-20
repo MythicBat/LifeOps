@@ -11,6 +11,7 @@ from lifeops.service import LifeOpsService
 from lifeops.dashboard import (get_dashboard_summary, get_user_items)
 from lifeops.ask_agent import ( ask_lifeops )
 from lifeops.life_graph import ( build_life_graph )
+from lifeops.daily_brief import (DailyBriefService)
 
 app = FastAPI(
     title="LifeOps Agent API",
@@ -37,6 +38,7 @@ region = os.getenv("AWS_REGION")
 dynamodb = boto3.resource("dynamodb", region_name=region)
 
 lifeops = LifeOpsService()
+daily_brief_service = (DailyBriefService())
 
 @app.get("/health")
 def health():
@@ -195,6 +197,18 @@ def graph(user_id: str = "demo-user"):
         return {
             "success": True,
             "graph": build_life_graph(user_id),
+        }
+    except Exception as error:
+        raise HTTPException(status_code=500, detail=str(error))
+
+@app.get("/daily-brief")
+def daily_brief(user_id: str = "demo-user"):
+    try:
+        brief = (daily_brief_service.generate(user_id))
+
+        return {
+            "success": True,
+            "brief": brief,
         }
     except Exception as error:
         raise HTTPException(status_code=500, detail=str(error))
