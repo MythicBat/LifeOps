@@ -9,6 +9,7 @@ from pydantic import BaseModel
 from lifeops.models import DocumentAnalysis
 from lifeops.service import LifeOpsService
 from lifeops.dashboard import (get_dashboard_summary, get_user_items)
+from lifeops.ask_agent import ( ask_lifeops )
 
 app = FastAPI(
     title="LifeOps Agent API",
@@ -25,6 +26,11 @@ app.add_middleware(
 
 class ResolveDecisionRequest(BaseModel):
     option: str
+
+class AskLifeOpsRequest(BaseModel):
+    message: str
+    userId: str = ("demo-user")
+    sessionId: (str | None) = None
 
 region = os.getenv("AWS_REGION")
 dynamodb = boto3.resource("dynamodb", region_name=region)
@@ -237,3 +243,18 @@ def resolve_decision(decision_id: str, request: ResolveDecisionRequest):
         "success": True,
         "decision": response.get("Attributes"),
     }
+
+@app.post("/ask")
+def ask(request: AskLifeOpsRequest):
+    try:
+        return {
+            "success": True,
+
+            **ask_lifeops(
+                user_id=request.userId,
+                message=request.message,
+                session_id=request.sessionId,
+            ),
+        }
+    except Exception as error:
+        raise HTTPException(status_code=500, detail=str(error))
