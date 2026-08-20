@@ -10,6 +10,7 @@ from lifeops.models import DocumentAnalysis
 from lifeops.service import LifeOpsService
 from lifeops.dashboard import (get_dashboard_summary, get_user_items)
 from lifeops.ask_agent import ( ask_lifeops )
+from lifeops.life_graph import ( build_life_graph )
 
 app = FastAPI(
     title="LifeOps Agent API",
@@ -184,6 +185,16 @@ def upcoming(user_id: str = "demo-user"):
         return {
             "success": True,
             "items": items,
+        }
+    except Exception as error:
+        raise HTTPException(status_code=500, detail=str(error))
+
+@app.get("/graph")
+def graph(user_id: str = "demo-user"):
+    try:
+        return {
+            "success": True,
+            "graph": build_life_graph(user_id),
         }
     except Exception as error:
         raise HTTPException(status_code=500, detail=str(error))
