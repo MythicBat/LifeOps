@@ -5,6 +5,7 @@ import { DecisionFeed } from "@/components/lifeops/DecisionFeed";
 import { LiveOverview } from "@/components/lifeops/LiveOverview";
 import { LiveActivityFeed } from "@/components/lifeops/LiveActivityFeed";
 import { AskLifeOps } from "@/components/lifeops/AskLifeOps";
+import { DailyBrief } from "@/components/lifeops/DailyBrief";
 
 import {
   ArrowRight,
@@ -69,6 +70,10 @@ export default function Home() {
             </div>
 
             <LiveOverview />
+          </section>
+
+          <section className="mt-8">
+            <DailyBrief />
           </section>
 
           <section className="mt-8">
