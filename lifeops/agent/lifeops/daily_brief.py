@@ -5,6 +5,7 @@ from strands import Agent
 from strands.models import (BedrockModel)
 
 from .dashboard import (get_user_items, get_dashboard_summary)
+from .tools.briefs import (save_brief)
 
 BRIEF_PROMPT = """
 You are the LifeOps Daily Brief agent.
@@ -118,5 +119,11 @@ AUTHORITATIVE LIFE STATE:
 )}
 """
         response = (self.agent(prompt))
+        content = str(response)
 
-        return str(response)
+        save_brief(
+            user_id=user_id,
+            content=content
+        )
+
+        return content
