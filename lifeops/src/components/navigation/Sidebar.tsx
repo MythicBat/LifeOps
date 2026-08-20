@@ -7,6 +7,7 @@ import {
   LockKeyhole,
   Settings,
   Vault,
+  Network,
 } from "lucide-react";
 
 import Link from "next/link";
@@ -27,6 +28,11 @@ const navigation = [
     label: "Vault",
     icon: Vault,
     href: "/vault",
+  },
+  {
+    label: "Life Graph",
+    icon: Network,
+    href: "/graph",
   },
   {
     label: "Upcoming",
