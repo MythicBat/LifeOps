@@ -6,12 +6,16 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
-from lifeops.models import DocumentAnalysis
+from lifeops.models import (DocumentAnalysis, AutonomySettings)
 from lifeops.service import LifeOpsService
 from lifeops.dashboard import (get_dashboard_summary, get_user_items)
 from lifeops.ask_agent import ( ask_lifeops )
 from lifeops.life_graph import ( build_life_graph )
 from lifeops.daily_brief import (DailyBriefService)
+from lifeops.autonomy import (
+    get_autonomy_settings,
+    save_autonomy_settings,
+)
 
 app = FastAPI(
     title="LifeOps Agent API",
@@ -314,6 +318,32 @@ def daily_brief(user_id: str = "demo-user"):
         }
     except Exception as error:
         raise HTTPException(status_code=500, detail=str(error))
+
+@app.get("/autonomy")
+def autonomy(user_id: str = "demo-user"):
+    settings = (
+        get_autonomy_settings(user_id)
+    )
+
+    return {
+        "success": True,
+        "settings": settings.model_dump(),
+    }
+
+@app.put("/autonomy")
+def update_autonomy(
+    settings: AutonomySettings,
+    user_id: str = "demo-user",
+):
+    saved = save_autonomy_settings(
+        user_id=user_id,
+        settings=settings,
+    )
+
+    return {
+        "success": True,
+        "settings": saved,
+    }
 
 @app.post("/process-document")
 def process_document(document: DocumentAnalysis):
