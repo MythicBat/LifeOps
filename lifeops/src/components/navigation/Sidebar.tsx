@@ -8,6 +8,7 @@ import {
   Settings,
   Vault,
   Network,
+  SlidersHorizontal,
 } from "lucide-react";
 
 import Link from "next/link";
@@ -39,6 +40,11 @@ const navigation = [
     icon: CalendarDays,
     href: "/upcoming",
   },
+  {
+    label: "Autonomy",
+    icon: SlidersHorizontal,
+    href: "/autonomy",
+  }
 ];
 
 export function Sidebar() {
