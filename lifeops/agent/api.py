@@ -122,15 +122,26 @@ def vault(user_id: str = "demo-user"):
             })
 
         # Subscriptions
+        latest_subscriptions = {}
+
         for item in subscriptions:
+            vendor_key = (item.get("vendorKey") or item.get("vendor", "unknown").lower().strip())
+
+            existing = (latest_subscriptions.get(vendor_key))
+
+            if (not existing or item.get("createdAt", "") > existing.get("createdAt", "")):
+                latest_subscriptions[
+                    vendor_key
+                ] = item
+
+        for item in (latest_subscriptions.values()):
             items.append({
                 "id": item.get("id"),
                 "category": "subscriptions",
                 "type": "subscription",
                 "title": item.get("vendor", "Subscription"),
                 "subtitle": "Subscription",
-                "amount": item.get("amount"),
-                "currency": item.get("currency", "AUD"),
+                "amount": item.get("currency", "AUD"),
                 "date": item.get("createdAt"),
                 "status": item.get("status", "active"),
                 "raw": item,
