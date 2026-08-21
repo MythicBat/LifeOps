@@ -84,3 +84,46 @@ class SubscriptionChange(BaseModel):
     monthlyDifference: Optional[float] = None
     annualImpact: Optional[float] = None
     percentageChange: Optional[float] = None
+
+class AutonomySettings(BaseModel):
+    everydayAdmin: Literal[
+        "auto",
+        "ask",
+        "observe",
+    ] = "auto"
+
+    money: Literal[
+        "auto",
+        "ask",
+        "observe",
+    ] = "ask"
+
+    appointments: Literal[
+        "auto",
+        "ask",
+        "observe",
+    ] = "ask"
+
+    subscriptions: Literal[
+        "auto",
+        "ask",
+        "observe",
+    ] = "ask"
+
+    documents: Literal[
+        "auto",
+        "ask",
+        "observe",
+    ] = "auto"
+
+    warranties: Literal[
+        "auto",
+        "ask",
+        "observe",
+    ] = "auto"
+
+    renewals: Literal[
+        "auto",
+        "ask",
+        "observe",
+    ] = "ask"
