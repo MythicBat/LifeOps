@@ -102,6 +102,95 @@ def vault(user_id: str = "demo-user"):
             get_user_items("DYNAMODB_APPOINTMENTS_TABLE", user_id)
         )
 
+        obligations = (get_user_items("DYNAMODB_OBLIGATIONS_TABLE", user_id))
+
+        items = []
+
+        # Bills / obligations
+        for item in obligations:
+            items.append({
+                "id": item.get("id"),
+                "category": "money",
+                "type": "obligation",
+                "title": item.get("title", "Bill"),
+                "subtitle": item.get("vendor", "Obligation"),
+                "amount": item.get("amount"),
+                "currency": item.get("currency", "AUD"),
+                "date": item.get("dueDate"),
+                "status": item.get("status", "open"),
+                "raw": item,
+            })
+
+        # Subscriptions
+        for item in subscriptions:
+            items.append({
+                "id": item.get("id"),
+                "category": "subscriptions",
+                "type": "subscription",
+                "title": item.get("vendor", "Subscription"),
+                "subtitle": "Subscription",
+                "amount": item.get("amount"),
+                "currency": item.get("currency", "AUD"),
+                "date": item.get("createdAt"),
+                "status": item.get("status", "active"),
+                "raw": item,
+            })
+
+        # Warranties
+        for item in warranties:
+            items.append({
+                "id": item.get("id"),
+                "category": "products",
+                "type": "warranty",
+                "title": item.get("productName", "Product"),
+                "subtitle": "Warranty",
+                "date": item.get("expiryDate"),
+                "status": item.get("status", "active"),
+                "raw": item,
+            })
+
+        # Renewals
+        for item in renewals:
+            items.append({
+                "id": item.get("id"),
+                "category": "money",
+                "type": "renewal",
+                "title": item.get("title", "Renewal"),
+                "subtitle": "Renewal",
+                "amount": item.get("amount"),
+                "currency": item.get("currency", "AUD"),
+                "date": item.get("renewalDate"),
+                "status": item.get("status", "upcoming"),
+                "raw": item,
+            })
+
+        # Appointments
+        for item in appointments:
+            items.append({
+                "id": item.get("id"),
+                "category": "health",
+                "type": "appointment",
+                "title": item.get("title", "Appointment"),
+                "subtitle": item.get("location", "Appointment"),
+                "date": item.get("appointmentDate"),
+                "time": item.get("startTime"),
+                "status": item.get("status", "scheduled"),
+                "raw": item,
+            })
+
+        # Original uploaded LifeObjects
+        for item in life_objects:
+            items.append({
+                "id": item.get("id"),
+                "category": "documents",
+                "type": item.get("type", "document"),
+                "title": item.get("title", item.get("vendor", "Document")),
+                "subtitle": "LifeObject",
+                "date": item.get("createdAt"),
+                "status": "stored",
+                "raw": item,
+            })
+
         return {
             "success": True,
             "vault": {
@@ -110,6 +199,8 @@ def vault(user_id: str = "demo-user"):
                 "renewals": renewals,
                 "subscriptions": subscriptions,
                 "appointments": appointments,
+                "obligations": obligations,
+                "items": items,
             },
         }
     except Exception as error:
