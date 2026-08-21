@@ -12,6 +12,7 @@ from .tools.subscriptions import (
     find_latest_subscription,
     record_subscription,
 )
+from .autonomy import (get_autonomy_settings)
 
 load_dotenv()
 
@@ -46,13 +47,15 @@ class LifeOpsService:
             planner_context["subscription"] = subscription_change
         plan = self.planner.plan(event, context=planner_context)
 
-        guardian = (evaluate_plan(plan))
+        autonomy_settings = (get_autonomy_settings(user_id))
+        guardian = (evaluate_plan(plan, autonomy_settings))
         execution = (
             self.executor.execute(
                 user_id=user_id,
                 document=document,
                 plan=plan,
                 guardian=guardian,
+                autonomy_settings=autonomy_settings,
                 context=planner_context,
             )
         )
@@ -90,5 +93,6 @@ class LifeOpsService:
             "plan": plan.model_dump(),
             "guardian": guardian.model_dump(),
             "execution": execution,
+            "autonomy": autonomy_settings.model_dump(),
             "intelligence": {"subscription", subscription_change}
         }

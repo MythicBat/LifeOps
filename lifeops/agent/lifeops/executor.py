@@ -3,10 +3,11 @@ from datetime import (
     timedelta,
 )
 from .models import (
+    AutonomySettings,
     DocumentAnalysis,
     LifeOpsPlan,
 )
-from .guardian import (GuardianDecision)
+from .guardian import (GuardianDecision, evaluate_action)
 from .tools.life_objects import (create_life_object)
 from .tools.obligations import (create_obligation)
 from .tools.runs import (record_agent_run)
@@ -20,22 +21,26 @@ class LifeOpsExecutor:
             document: DocumentAnalysis, 
             plan: LifeOpsPlan, 
             guardian: GuardianDecision,
+            autonomy_settings: AutonomySettings,
             context: dict | None = None,
         ) -> dict:
         context = context or {}
-
-        if not guardian.permitted:
-            return {
-                "executed": False,
-                "reason": guardian.reason,
-                "results": [],
-            }
 
         results = []
         life_object_id = None
         obligation_id = None
 
         for action in plan.actions:
+
+            action_guardian = (evaluate_action(action.type, autonomy_settings))
+
+            if not action_guardian.permitted:
+                results.append({
+                    "action": action.type,
+                    "executed": False,
+                    "guardian": action_guardian.model_dump(),
+                })
+                continue
 
             # CREATE LIFE OBJECT
             if (action.type == "create_life_object"):
@@ -55,6 +60,8 @@ class LifeOpsExecutor:
 
                 results.append({
                     "action": action.type,
+                    "executed": True,
+                    "guardian": action_guardian.model_dump(),
                     "result": result,
                 })
 
@@ -81,6 +88,8 @@ class LifeOpsExecutor:
 
                 results.append({
                     "action": action.type,
+                    "executed": True,
+                    "guardian": action_guardian.model_dump(),
                     "result": result,
                 })
 
@@ -105,6 +114,8 @@ class LifeOpsExecutor:
 
                 results.append({
                     "action": action.type,
+                    "executed": True,
+                    "guardian": action_guardian.model_dump(),
                     "result": result,
                 })
 
@@ -134,6 +145,8 @@ class LifeOpsExecutor:
 
                 results.append({
                     "action": action.type,
+                    "executed": True,
+                    "guardian": action_guardian.model_dump(),
                     "result": decision,
                 })
 
@@ -144,7 +157,7 @@ class LifeOpsExecutor:
             status="completed",
             summary=plan.briefing,
             actions=[
-                result["action"] for result in results
+                result["action"] for result in results if result.get("executed")
             ],
         )
 
