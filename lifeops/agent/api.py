@@ -18,6 +18,7 @@ from lifeops.autonomy import (
 )
 from .lifeops.command_center import (CommandCenterService)
 from .lifeops.timeline import (build_timeline)
+from .lifeops.notifications import (build_notifications)
 
 app = FastAPI(
     title="LifeOps Agent API",
@@ -300,6 +301,16 @@ def upcoming(user_id: str = "demo-user"):
         return {
             "success": True,
             "items": items,
+        }
+    except Exception as error:
+        raise HTTPException(status_code=500, detail=str(error))
+
+@app.get("/notifications")
+def notifications(user_id: str = "demo-user"):
+    try:
+        return {
+            "success": True,
+            "notifications": build_notifications(user_id)
         }
     except Exception as error:
         raise HTTPException(status_code=500, detail=str(error))
