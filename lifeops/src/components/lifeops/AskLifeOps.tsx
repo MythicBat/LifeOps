@@ -4,6 +4,9 @@ import { useState } from "react";
 
 import { ArrowUp, Sparkles } from "lucide-react";
 
+import { runLifeOpsCommand, type LifeOpsCommandResult } from "@/lib/command-center";
+import { CommandResult } from "./CommandResult";
+
 interface Message {
     role: "user" | "assistant";
     content : string;
@@ -18,10 +21,23 @@ export function AskLifeOps() {
 
     const [loading, setLoading] = useState(false);
 
+    const [commandResult, setCommandResult] = useState<LifeOpsCommandResult | null>(null);
+
     const submit = async(event: React.SyntheticEvent<HTMLFormElement>) => {
         event.preventDefault();
 
         const message = input.trim();
+
+        const commandPrompts = [
+            "clean up my month",
+            "review my month",
+            "organise my month",
+            "what needs my attention",
+            "review my subscriptions",
+        ];
+
+        const shouldUseCommandCenter = commandPrompts.some((command) => 
+            message.toLowerCase().includes(command));
 
         if (!message || loading) { return; }
 
@@ -37,6 +53,38 @@ export function AskLifeOps() {
         setLoading(true);
 
         try {
+            if (shouldUseCommandCenter) {
+                try {
+                    setCommandResult(null);
+
+                    const result = await runLifeOpsCommand(message);
+
+                    setCommandResult(result);
+
+                    setMessages((current) => [
+                        ...current,
+                        {
+                            role: "assistant",
+                            content: result.summary,
+                        },
+                    ]);
+                } catch (error) {
+                    console.error(error);
+
+                    setMessages((current) => [
+                        ...current,
+                        {
+                            role: "assistant",
+                            content: "I could not complete that LifeOps command.",
+                        },
+                    ]);
+                } finally {
+                    setLoading(false);
+                }
+
+                return;
+            }
+
             const response = await fetch("/api/ask", {
                 method: "POST",
                 headers: {
@@ -138,6 +186,20 @@ export function AskLifeOps() {
                             </button>
                         ))}
                     </div>
+                </div>
+            )}
+
+            {commandResult && (
+                <div className="px-4 pb-2 sm:px-5">
+                    <CommandResult 
+                        result={commandResult}
+                        onDecision={() => {
+                            document.getElementById("decisions")?.scrollIntoView({
+                                behavior: "smooth",
+                                block: "start"
+                            });
+                        }}
+                    />
                 </div>
             )}
 

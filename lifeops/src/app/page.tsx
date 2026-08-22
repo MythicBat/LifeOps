@@ -80,7 +80,12 @@ export default function Home() {
             <AskLifeOps />
           </section>
 
-          <DecisionFeed />
+          <section
+            id="decisions"
+            className="mt-10"
+          >
+            <DecisionFeed />
+          </section>
 
           <section className="mt-12 pb-16">
             <div className="mb-5 flex items-end justify-between">

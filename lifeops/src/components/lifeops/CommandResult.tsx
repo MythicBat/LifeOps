@@ -13,9 +13,10 @@ import type {
 
 export function CommandResult({
   result,
+  onDecision,
 }: {
-  result:
-    LifeOpsCommandResult;
+  result: LifeOpsCommandResult;
+  onDecision?: (decisionId: string) => void;
 }) {
 
   return (
@@ -172,7 +173,14 @@ export function CommandResult({
 
               {item.actionLabel && (
 
-                <button className="flex shrink-0 items-center gap-1.5 rounded-full bg-zinc-950 px-4 py-2 text-xs font-medium text-white transition hover:bg-zinc-800">
+                <button
+                    onClick={() => {
+                        if (item.decisionId && onDecision) {
+                            onDecision(item.decisionId);
+                        }
+                    }}
+                    className="flex shrink-0 items-center gap-1.5 rounded-full bg-zinc-950 px-4 py-2 text-xs font-medium text-white transition hover:bg-zinc-800"
+                >
 
                   {item.actionLabel}
 
