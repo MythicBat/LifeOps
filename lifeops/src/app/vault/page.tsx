@@ -99,26 +99,22 @@ export default function VaultPage() {
       null
     );
 
-
   useEffect(() => {
+    getVault().then((vault) => {
+      if (!vault) {
+        setItems([]);
+        return;
+      }
 
-    getVault()
-      .then(
-        (vault) =>
-          setItems(
-            vault.items ?? []
-          )
-      )
-      .catch(
-        console.error
-      )
-      .finally(
-        () =>
-          setLoading(false)
-      );
+      setItems(vault.items ?? []);
+    }).catch((error) => {
+      console.error("Vault load error: ", error);
 
+      setItems([]);
+    }).finally(() => {
+      setLoading(false);
+    });
   }, []);
-
 
   const filtered =
     useMemo(

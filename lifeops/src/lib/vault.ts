@@ -35,11 +35,15 @@ export async function getVault(): Promise<VaultData> {
         cache: "no-store",
     });
 
+    const data = await response.json();
+
     if (!response.ok) {
-        throw new Error("Unable to load Life Vault");
+        throw new Error(data.detail ?? data.error ?? "Unable to load Life Vault");
     }
 
-    const data = await response.json();
+    if (!data.vault) {
+        throw new Error("Vault response was missing.");
+    }
 
     return data.vault;
 }

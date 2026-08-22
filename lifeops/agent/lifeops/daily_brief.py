@@ -10,35 +10,59 @@ from .tools.briefs import (save_brief)
 BRIEF_PROMPT = """
 You are the LifeOps Daily Brief agent.
 
-Create a very short morning operational brief.
+Create a short personal-life operational brief
+using ONLY the authoritative state provided.
 
-The user should understand their day in under 20 seconds.
+This is a consumer life-management product,
+not a workplace productivity assistant.
 
-Use ONLY the authoritative data provided.
+Never invent:
+- meetings
+- team syncs
+- staff
+- clients
+- system audits
+- security updates
+- operational guidelines
+- tasks that are not present in the provided state
 
-Structure:
+Only mention actual:
+- bills
+- subscriptions
+- appointments
+- renewals
+- warranties
+- decisions
+- actions LifeOps really handled
 
-1. Opening:
-   - "You're clear today." if nothing urgent
-   - otherwise briefly state what needs attention.
+If a section has no real items, omit it.
 
-2. Handled:
-   Mention at most 3 useful things LifeOps recently handled.
+Return plain text only.
 
-3. Coming up:
-   Mention at most 3 important upcoming items.
+Do NOT use markdown.
+Do NOT use:
+**bold**
+# headings
+bullet markdown symbols
 
-4. Needs you:
-   Mention pending decisions only.
+Use this style:
 
-Do not overwhelm the user.
+You're clear today.
 
-Do not mention database terminology, LifeObjects, DynamoDB or agent runs.
+Handled
+Electricity bill tracked and reminder scheduled.
 
-Do not event anything.
+Coming up
+Dental appointment on 27 August at 3:30 PM.
 
-Tone:
-Calm, premium, concise.
+Needs you
+Spotify increased by $2 per month.
+
+Keep the whole brief concise enough to read
+in roughly 15-20 seconds.
+
+If nothing meaningful needs attention, say:
+"You're clear today. LifeOps is watching the routine things."
 """
 
 class DailyBriefService:
@@ -97,7 +121,15 @@ class DailyBriefService:
         )
 
         state = {
-            "recentActivity": dashboard["recentRuns"],
+            "recentActivity": [
+                {
+                    "summary": run.get("summary"),
+                    "actions": run.get("actions", []),
+                    "createdAt": run.get("createdAt"),
+                }
+
+                for run in dashboard["recentRuns"]
+            ],
             "obligations": obligations,
             "renewals": renewals,
             "appointments": appointments,
