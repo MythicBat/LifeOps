@@ -6,6 +6,8 @@ import { Toaster } from "sonner";
 
 import "./globals.css";
 
+import { CommandPalette } from "@/components/lifeops/CommandPalette";
+
 export const metadata: Metadata = {
   title: "LifeOps — Life, handled.",
   description:
@@ -21,6 +23,8 @@ export default function RootLayout({
     <html lang="en">
       <body>
         {children}
+
+        <CommandPalette />
 
         <Toaster
           position="bottom-right"
