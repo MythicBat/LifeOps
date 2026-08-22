@@ -1,4 +1,3 @@
-import { LifeOpsOrb } from "@/components/lifeops/LifeOpsOrb";
 import { Sidebar } from "@/components/navigation/Sidebar";
 import { AddAnythingButton } from "@/components/lifeops/AddAnythingButton";
 import { DecisionFeed } from "@/components/lifeops/DecisionFeed";
@@ -8,11 +7,11 @@ import { AskLifeOps } from "@/components/lifeops/AskLifeOps";
 import { DailyBrief } from "@/components/lifeops/DailyBrief";
 import { NotificationBell } from "@/components/lifeops/NotificationBell";
 import { CommandTrigger } from "@/components/lifeops/CommandTrigger";
+import { LifeOpsHero } from "@/components/lifeops/LifeOpsHero";
 
-import {
-  ArrowRight,
-  Sparkles,
-} from "lucide-react";
+import { getGreeting, getTodayLabel } from "@/lib/greeting";
+
+import Link from "next/link";
 
 export default function Home() {
   return (
@@ -24,11 +23,11 @@ export default function Home() {
           <header className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-zinc-400">
-                Wednesday, August 12
+                {getTodayLabel()}
               </p>
 
               <h1 className="mt-2 text-3xl font-semibold tracking-[-0.03em] text-zinc-950 md:text-4xl">
-                Good afternoon.
+                {getGreeting()}
               </h1>
 
               <p className="mt-2 text-lg text-zinc-400">
@@ -38,7 +37,7 @@ export default function Home() {
 
             <div className="flex items-center gap-2">
               <CommandTrigger />
-              
+
               <NotificationBell />
               
               <AddAnythingButton />
@@ -46,36 +45,7 @@ export default function Home() {
           </header>
 
           <section className="mt-10 grid gap-6 lg:grid-cols-[1.15fr_0.85fr]">
-            <div className="relative overflow-hidden rounded-[32px] border border-black/[0.05] bg-white p-8 shadow-[0_18px_60px_rgba(0,0,0,0.04)] md:p-10">
-              <div className="relative z-10">
-                <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-[0.16em] text-zinc-400">
-                  <Sparkles size={14} />
-                  LifeOps Brief
-                </div>
-
-                <div className="mt-2 flex justify-center">
-                  <LifeOpsOrb state="idle" />
-                </div>
-
-                <div className="text-center">
-                  <p className="text-5xl font-semibold tracking-[-0.05em] text-zinc-950">
-                    7
-                  </p>
-
-                  <p className="mt-2 text-sm text-zinc-400">
-                    things handled this week
-                  </p>
-                </div>
-
-                <div className="mt-8 flex justify-center">
-                  <button className="flex items-center gap-2 text-sm font-medium text-zinc-600 transition hover:text-zinc-950">
-                    View LifeOps activity
-
-                    <ArrowRight size={15} />
-                  </button>
-                </div>
-              </div>
-            </div>
+            <LifeOpsHero />
 
             <LiveOverview />
           </section>
@@ -107,9 +77,12 @@ export default function Home() {
                 </h2>
               </div>
 
-              <button className="text-sm font-medium text-zinc-400 transition hover:text-zinc-950">
+              <Link
+                href="/activity"
+                className="text-sm font-medium text-zinc-400 transition hover:text-zinc-950"
+              >
                 View all
-              </button>
+              </Link>
             </div>
 
             <LiveActivityFeed />
