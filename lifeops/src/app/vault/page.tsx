@@ -1,7 +1,5 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-
 import {
   useEffect,
   useMemo,
@@ -9,7 +7,6 @@ import {
 } from "react";
 
 import {
-  Plus,
   Search,
 } from "lucide-react";
 
@@ -30,6 +27,7 @@ import {
   type VaultCategory,
   type VaultItem,
 } from "@/lib/vault";
+import { AddAnythingButton } from "@/components/lifeops/AddAnythingButton";
 
 
 const categories: {
@@ -64,8 +62,6 @@ const categories: {
 
 
 export default function VaultPage() {
-
-  const router = useRouter();
 
   const [
     items,
@@ -204,16 +200,7 @@ export default function VaultPage() {
 
             </div>
 
-            <button
-              onClick={() => router.push("/?add=true")}
-              className="flex shrink-0 items-center justify-center gap-2 rounded-full bg-zinc-950 px-5 py-3 text-sm font-medium text-white shadow-sm transition hover:bg-zinc-800"
-            >
-              <Plus
-                size={16}
-              />
-
-              Add anything
-            </button>
+            <AddAnythingButton />
 
           </div>
 

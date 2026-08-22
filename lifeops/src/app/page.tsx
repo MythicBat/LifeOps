@@ -7,6 +7,7 @@ import { LiveActivityFeed } from "@/components/lifeops/LiveActivityFeed";
 import { AskLifeOps } from "@/components/lifeops/AskLifeOps";
 import { DailyBrief } from "@/components/lifeops/DailyBrief";
 import { NotificationBell } from "@/components/lifeops/NotificationBell";
+import { CommandTrigger } from "@/components/lifeops/CommandTrigger";
 
 import {
   ArrowRight,
@@ -36,6 +37,8 @@ export default function Home() {
             </div>
 
             <div className="flex items-center gap-2">
+              <CommandTrigger />
+              
               <NotificationBell />
               
               <AddAnythingButton />
