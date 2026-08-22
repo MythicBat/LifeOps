@@ -57,26 +57,26 @@ export function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="hidden h-screen w-[250px] shrink-0 border-r border-black/[0.06] bg-white/60 px-4 py-6 backdrop-blur-xl lg:flex lg:flex-col">
-      <div className="px-3">
-        <div className="flex items-center gap-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-zinc-950 text-sm font-semibold text-white">
+    <aside className="sticky top-0 hidden h-screen w-[250px] shrink-0 flex-col border-r border-black/[0.05] bg-white/70 px-4 py-5 backdrop-blur-xl lg:flex">
+      <div className="mb-8 px-2">
+        <div className="flex items-center gap-2.5">
+          <div className="flex h-8 w-8 items-center justify-center rounded-[11px] bg-zinc-950 text-xs font-semibold text-white">
             L
           </div>
 
           <div>
-            <p className="text-[15px] font-semibold tracking-tight text-zinc-950">
+            <p className="text-[15px] font-semibold tracking-[-0.02em] text-zinc-950">
               LifeOps
             </p>
 
-            <p className="text-xs text-zinc-400">
+            <p className="mt-0.5 text-[11px] text-zinc-400">
               Life, handled.
             </p>
           </div>
         </div>
       </div>
 
-      <nav className="mt-10 space-y-1">
+      <nav className="space-y-1">
         {navigation.map((item) => {
           const Icon = item.icon;
 
@@ -84,7 +84,7 @@ export function Sidebar() {
             <Link
               key={item.label}
               href={item.href}
-              className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition ${
+              className={`flex w-full items-center gap-3 rounded-[14px] px-3 py-2.5 text-sm transition ${
                 pathname === item.href
                   ? "bg-zinc-950 text-white shadow-sm"
                   : "text-zinc-500 hover:bg-zinc-100 hover:text-zinc-950"
@@ -99,15 +99,22 @@ export function Sidebar() {
       </nav>
 
       <div className="mt-auto space-y-1">
-        <button className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-zinc-500 transition hover:bg-zinc-100 hover:text-zinc-950">
+        <Link
+          href="/trust"
+          className="flex w-full items-center gap-3 rounded-[14px] px-3 py-2.5 text-sm font-medium text-zinc-500 transition hover:bg-zinc-100 hover:text-zinc-950"
+        >
           <LockKeyhole size={17} strokeWidth={1.8} />
-          Trust Centre
-        </button>
+          Trust Center
+        </Link>
 
-        <button className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-zinc-500 transition hover:bg-zinc-100 hover:text-zinc-950">
+        <Link
+          href="/settings"
+          className="flex w-full items-center gap-3 rounded-[14px] px-3 py-2.5 text-sm font-medium text-zinc-500 transition hover:bg-zinc-100 hover:text-zinc-950"
+        >
           <Settings size={17} strokeWidth={1.8} />
+
           Settings
-        </button>
+        </Link>
 
         <div className="mt-5 flex items-center gap-3 border-t border-black/[0.05] px-3 pt-5">
           <div className="flex h-9 w-9 items-center justify-center rounded-full bg-zinc-200 text-sm font-medium">
