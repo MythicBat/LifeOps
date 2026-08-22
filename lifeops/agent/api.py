@@ -326,7 +326,7 @@ def daily_brief(user_id: str = "demo-user"):
     except Exception as error:
         raise HTTPException(status_code=500, detail=str(error))
 
-@app.post("/timeline")
+@app.get("/timeline")
 def timeline(user_id: str = "demo-user"):
     try:
         return {
