@@ -10,6 +10,8 @@ import {
   CircleAlert,
 } from "lucide-react";
 
+import { useRouter } from "next/navigation";
+
 
 interface Notification {
   id: string;
@@ -27,6 +29,8 @@ interface Notification {
 
 
 export function NotificationBell() {
+
+  const router = useRouter();
 
   const [
     notifications,
@@ -161,12 +165,12 @@ export function NotificationBell() {
                             behavior: "smooth",
                           });
                         } else {
-                          window.location.href = "/#decisions";
+                          router.push("/#decisions");
                         }
                       } else if (
                         notification.target === "upcoming"
                       ) {
-                          window.location.href = "/upcoming";
+                          router.push("/upcoming");
                         }
 
                       setOpen(
