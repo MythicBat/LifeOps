@@ -12,8 +12,13 @@ import { LifeOpsHero } from "@/components/lifeops/LifeOpsHero";
 import { getGreeting, getTodayLabel } from "@/lib/greeting";
 
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 
 export default function Home() {
+  const searchParams = useSearchParams();
+
+  const incomingCommand = searchParams.get("command");
+
   return (
     <main className="flex min-h-screen bg-[#f5f5f7]">
       <Sidebar />
@@ -55,7 +60,7 @@ export default function Home() {
           </section>
 
           <section className="mt-8">
-            <AskLifeOps />
+            <AskLifeOps initialCommand={incomingCommand} />
           </section>
 
           <section

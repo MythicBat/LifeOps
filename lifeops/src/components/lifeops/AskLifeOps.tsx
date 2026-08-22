@@ -12,8 +12,8 @@ interface Message {
     content : string;
 }
 
-export function AskLifeOps() {
-    const [input, setInput] = useState("");
+export function AskLifeOps({initialCommand}: {initialCommand?: string | null;}) {
+    const [input, setInput] = useState(() => initialCommand ?? "");
 
     const [messages, setMessages] = useState<Message[]>([]);
 
