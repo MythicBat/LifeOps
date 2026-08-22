@@ -9,6 +9,7 @@ import {
   Vault,
   Network,
   SlidersHorizontal,
+  ListTree,
 } from "lucide-react";
 
 import Link from "next/link";
@@ -19,6 +20,11 @@ const navigation = [
     label: "Home",
     icon: Home,
     href: "/",
+  },
+  {
+    label: "Timeline",
+    icon: ListTree,
+    href: "/timeline",
   },
   {
     label: "Activity",
