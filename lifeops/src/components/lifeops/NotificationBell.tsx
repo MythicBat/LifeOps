@@ -151,29 +151,23 @@ export function NotificationBell() {
                     () => {
 
                       if (
-                        notification.target
-                        ===
-                        "decisions"
+                        notification.target === "decisions"
                       ) {
 
-                        document
-                          .getElementById(
-                            "decisions"
-                          )
-                          ?.scrollIntoView({
-                            behavior:
-                              "smooth",
+                        const decisions = document.getElementById("decisions");
+
+                        if (decisions) {
+                          decisions.scrollIntoView({
+                            behavior: "smooth",
                           });
-
+                        } else {
+                          window.location.href = "/#decisions";
+                        }
                       } else if (
-                        notification.target
-                        ===
-                        "upcoming"
+                        notification.target === "upcoming"
                       ) {
-
-                        window.location.href =
-                          "/upcoming";
-                      }
+                          window.location.href = "/upcoming";
+                        }
 
                       setOpen(
                         false

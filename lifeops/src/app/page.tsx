@@ -6,6 +6,7 @@ import { LiveOverview } from "@/components/lifeops/LiveOverview";
 import { LiveActivityFeed } from "@/components/lifeops/LiveActivityFeed";
 import { AskLifeOps } from "@/components/lifeops/AskLifeOps";
 import { DailyBrief } from "@/components/lifeops/DailyBrief";
+import { NotificationBell } from "@/components/lifeops/NotificationBell";
 
 import {
   ArrowRight,
@@ -34,7 +35,11 @@ export default function Home() {
               </p>
             </div>
 
-            <AddAnythingButton />
+            <div className="flex items-center gap-2">
+              <NotificationBell />
+              
+              <AddAnythingButton />
+            </div>
           </header>
 
           <section className="mt-10 grid gap-6 lg:grid-cols-[1.15fr_0.85fr]">
