@@ -7,7 +7,7 @@ import { Toaster } from "sonner";
 import "./globals.css";
 
 import { CommandPalette } from "@/components/lifeops/CommandPalette";
-import { GlobalUniversalDrop } from "@/components/lifeops/GlobalUniversalDrop";
+import { MobileNavigation } from "@/components/navigation/MobileNavigation";
 
 export const metadata: Metadata = {
   title: "LifeOps — Life, handled.",
@@ -25,9 +25,9 @@ export default function RootLayout({
       <body>
         {children}
 
-        <CommandPalette />
+        <MobileNavigation />
 
-        <GlobalUniversalDrop />
+        <CommandPalette />
 
         <Toaster
           position="bottom-right"
