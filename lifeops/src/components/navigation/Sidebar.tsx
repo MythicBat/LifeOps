@@ -15,6 +15,8 @@ import {
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
+import { UserProfile } from "../auth/UserProfile";
+
 const navigation = [
   {
     label: "Home",
@@ -116,21 +118,7 @@ export function Sidebar() {
           Settings
         </Link>
 
-        <div className="mt-5 flex items-center gap-3 border-t border-black/[0.05] px-3 pt-5">
-          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-zinc-200 text-sm font-medium">
-            AM
-          </div>
-
-          <div className="min-w-0">
-            <p className="truncate text-sm font-medium text-zinc-900">
-              Alin
-            </p>
-
-            <p className="text-xs text-zinc-400">
-              Balanced autonomy
-            </p>
-          </div>
-        </div>
+        <UserProfile />
       </div>
     </aside>
   );
