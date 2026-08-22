@@ -40,7 +40,7 @@ export function LifeOpsHero() {
     dashboard?.counts.actionsHandled;
 
   return (
-    <div className="relative overflow-hidden rounded-[32px] border border-black/[0.05] bg-white p-8 shadow-[0_18px_60px_rgba(0,0,0,0.04)] md:p-10">
+    <div className="relative overflow-hidden rounded-[28px] border border-black/[0.05] bg-white p-6 shadow-[0_18px_60px_rgba(0,0,0,0.04)] sm:rounded-[32px] sm:p-8 md:p-10">
 
       <div className="relative z-10">
 
@@ -66,7 +66,7 @@ export function LifeOpsHero() {
 
           ) : (
 
-            <p className="text-5xl font-semibold tracking-[-0.05em] text-zinc-950">
+            <p className="text-4xl sm:text-5xl font-semibold tracking-[-0.05em] text-zinc-950">
               {handled}
             </p>
 

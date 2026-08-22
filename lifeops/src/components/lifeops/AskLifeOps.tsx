@@ -138,8 +138,8 @@ export function AskLifeOps({initialCommand}: {initialCommand?: string | null;}) 
                             className={message.role === "user" ? "flex justify-end" : "flex justify-start"}
                         >
                             <div className={message.role === "user"
-                                ? "max-w-[78%] rounded-[22px] bg-zinc-950 px-4 py-3 text-sm leading-6 text-white"
-                                : "max-w-[86%] text-[15px] leading-7 text-zinc-700"
+                                ? "max-w-[88%] sm:max-w-[78%] rounded-[22px] bg-zinc-950 px-4 py-3 text-sm leading-6 text-white"
+                                : "max-w-[94%] sm:max-w-[86%] text-[15px] leading-7 text-zinc-700"
                             }>
                                 {message.content}
                             </div>

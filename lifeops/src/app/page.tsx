@@ -24,8 +24,8 @@ export default function Home() {
       <Sidebar />
 
       <section className="min-w-0 flex-1">
-        <div className="mx-auto max-w-[1180px] px-6 py-8 md:px-10 lg:px-12 lg:py-12">
-          <header className="flex items-center justify-between">
+        <div className="mx-auto max-w-[1180px] px-5 pb-28 pt-7 md:px-10 lg:px-12 lg:py-12">
+          <header className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
             <div>
               <p className="text-sm font-medium text-zinc-400">
                 {getTodayLabel()}
@@ -40,7 +40,7 @@ export default function Home() {
               </p>
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <CommandTrigger />
 
               <NotificationBell />

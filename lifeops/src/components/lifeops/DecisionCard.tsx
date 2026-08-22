@@ -33,7 +33,7 @@ export function DecisionCard({decision, onResolved,}: { decision: LifeOpsDecisio
 
   return (
     <div className="overflow-hidden rounded-[28px] border border-black/[0.06] bg-white shadow-[0_20px_60px_rgba(0,0,0,0.06)]">
-      <div className="p-6 sm:p-7">
+      <div className="p-5 sm:p-7">
         <div className="flex items-start justify-between gap-5">
           <div>
             <div className="flex items-center gap-2">
