@@ -16,6 +16,7 @@ from lifeops.autonomy import (
     get_autonomy_settings,
     save_autonomy_settings,
 )
+from .lifeops.command_center import (CommandCenterService)
 
 app = FastAPI(
     title="LifeOps Agent API",
@@ -38,11 +39,16 @@ class AskLifeOpsRequest(BaseModel):
     userId: str = ("demo-user")
     sessionId: (str | None) = None
 
+class CommandRequest(BaseModel):
+    command: str
+    userId: str = ("demo-user")
+
 region = os.getenv("AWS_REGION")
 dynamodb = boto3.resource("dynamodb", region_name=region)
 
 lifeops = LifeOpsService()
 daily_brief_service = (DailyBriefService())
+command_center = (CommandCenterService())
 
 @app.get("/health")
 def health():
@@ -412,6 +418,21 @@ def ask(request: AskLifeOpsRequest):
                 message=request.message,
                 session_id=request.sessionId,
             ),
+        }
+    except Exception as error:
+        raise HTTPException(status_code=500, detail=str(error))
+
+@app.post("/command")
+def command(request: CommandRequest):
+    try:
+        result = (command_center.run(
+            user_id=request.userId,
+            command=request.command,
+        ))
+
+        return {
+            "success": True,
+            "result": result.model_dump()
         }
     except Exception as error:
         raise HTTPException(status_code=500, detail=str(error))
