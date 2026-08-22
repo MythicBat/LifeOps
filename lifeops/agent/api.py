@@ -16,9 +16,9 @@ from lifeops.autonomy import (
     get_autonomy_settings,
     save_autonomy_settings,
 )
-from .lifeops.command_center import (CommandCenterService)
-from .lifeops.timeline import (build_timeline)
-from .lifeops.notifications import (build_notifications)
+from lifeops.command_center import (CommandCenterService)
+from lifeops.timeline import (build_timeline)
+from lifeops.notifications import (build_notifications)
 
 app = FastAPI(
     title="LifeOps Agent API",

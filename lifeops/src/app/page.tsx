@@ -12,12 +12,16 @@ import { LifeOpsHero } from "@/components/lifeops/LifeOpsHero";
 import { getGreeting, getTodayLabel } from "@/lib/greeting";
 
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
 
-export default function Home() {
-  const searchParams = useSearchParams();
+export default async function Home({
+  searchParams,
+}: {
+  searchParams: Promise<{command?: string;}>
+}) {
 
-  const incomingCommand = searchParams.get("command");
+  const params = await searchParams;
+
+  const incomingCommand = params.command ?? null;
 
   return (
     <main className="flex min-h-screen bg-[#f5f5f7]">
