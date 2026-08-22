@@ -175,6 +175,15 @@ class CommandCenterService:
 
     def run(self, user_id: str, command: str) -> LifeOpsCommandResult:
         state = self.build_state(user_id)
+        reviewed_count = sum([
+            len(state["obligations"]),
+            len(state["decisions"]),
+            len(state["subscriptions"]),
+            len(state["warranties"]),
+            len(state["renewals"]),
+            len(state["appointments"]),
+        ])
+        attention_count = len(state["decisions"])
 
         prompt = f"""
 USER COMMAND:
@@ -201,4 +210,9 @@ AUTHORITATIVE LIFE STATE:
 
         data = json.loads(text.strip())
 
-        return LifeOpsCommandResult(**data)
+        result = (LifeOpsCommandResult(**data))
+
+        result.reviewedCount = (reviewed_count)
+        result.attentionCount = (attention_count)
+
+        return result
