@@ -127,3 +127,32 @@ class AutonomySettings(BaseModel):
         "ask",
         "observe",
     ] = "ask"
+
+class CommandMetric(BaseModel):
+    label: str
+    value: str
+
+class CommandItem(BaseModel):
+    id: Optional[str] = None
+    type: Literal[
+        "handled",
+        "attention",
+        "decision",
+        "upcoming",
+        "saving",
+        "info",
+    ]
+    title: str
+    description: Optional[str] = None
+    value: Optional[str] = None
+    actionLabel: Optional[str] = None
+    decisionId: Optional[str] = None
+
+class LifeOpsCommandResult(BaseModel):
+    title: str
+    summary: str
+    reviewedCount: int = 0
+    handledCount: int = 0
+    attentionCount: int = 0
+    metrics: list[CommandMetric] = Field(default_factory=list)
+    items: list[CommandItem] = Field(default_factory=list)
