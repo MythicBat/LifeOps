@@ -17,6 +17,7 @@ from lifeops.autonomy import (
     save_autonomy_settings,
 )
 from .lifeops.command_center import (CommandCenterService)
+from .lifeops.timeline import (build_timeline)
 
 app = FastAPI(
     title="LifeOps Agent API",
@@ -321,6 +322,16 @@ def daily_brief(user_id: str = "demo-user"):
         return {
             "success": True,
             "brief": brief,
+        }
+    except Exception as error:
+        raise HTTPException(status_code=500, detail=str(error))
+
+@app.post("/timeline")
+def timeline(user_id: str = "demo-user"):
+    try:
+        return {
+            "success": True,
+            "items": build_timeline(user_id),
         }
     except Exception as error:
         raise HTTPException(status_code=500, detail=str(error))
