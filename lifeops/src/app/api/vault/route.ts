@@ -1,30 +1,60 @@
-import { NextResponse } from "next/server";
+import {
+  NextResponse,
+} from "next/server";
+
+
+const API_URL = process.env.LIFEOPS_AGENT_API
+
 
 export async function GET() {
-    const agentApi = process.env.LIFEOPS_AGENT_API;
+  try {
 
-    if (!agentApi) {
-        return NextResponse.json(
-            {success: false},
-            {status: 500},
-        );
+    const response =
+      await fetch(
+        `${API_URL}/vault`,
+        {
+          method: "GET",
+          cache: "no-store",
+        }
+      );
+
+
+    const data =
+      await response.json();
+
+
+    if (!response.ok) {
+      return NextResponse.json(
+        data,
+        {
+          status:
+            response.status,
+        }
+      );
     }
 
-    try {
-        const response = await fetch(`${agentApi}/vault`, {
-            cache: "no-store",
-        });
 
-        const data = response.json();
+    return NextResponse.json(
+      data
+    );
 
-        return NextResponse.json(
-            data,
-            {status: response.status},
-        );
-    } catch {
-        return NextResponse.json(
-            {success: false},
-            {status: 500},
-        );
-    }
+  } catch (error) {
+
+    console.error(
+      "Vault proxy error:",
+      error
+    );
+
+
+    return NextResponse.json(
+      {
+        success: false,
+        error:
+          "Unable to connect to LifeOps backend.",
+      },
+      {
+        status: 500,
+      }
+    );
+  }
 }

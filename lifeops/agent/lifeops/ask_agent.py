@@ -43,6 +43,13 @@ IMPORTANT RULES:
 
 - If everything is under control, say so.
 
+You may use lightweight Markdown when it improves readability:
+- short bullet lists
+- bold emphasis
+- numbered steps
+
+Avoid excessive headings or decorative formatting.
+
 Your tone should feel like a highly competent personal chief of staff.
 """
 
