@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 
 import {
+  usePathname,
   useRouter,
 } from "next/navigation";
 
@@ -102,6 +103,8 @@ const quickActions = [
 
 export function CommandPalette() {
 
+  const pathname = usePathname();
+
   const router =
     useRouter();
 
@@ -121,7 +124,6 @@ export function CommandPalette() {
     setQuery,
   ] =
     useState("");
-
 
   useEffect(() => {
 
@@ -213,6 +215,16 @@ export function CommandPalette() {
 
   }, [open]);
 
+  const authPage = [
+    "/login",
+    "/signup",
+    "/verify",
+    "/forgot-password",
+  ].some((route) => pathname.startsWith(route));
+
+  if (authPage) {
+    return null;
+  }
 
   function close() {
 

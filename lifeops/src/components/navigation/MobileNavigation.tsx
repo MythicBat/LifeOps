@@ -67,6 +67,17 @@ export function MobileNavigation() {
 
   const router =
     useRouter();
+  
+  const authPage = [
+    "/login",
+    "/signup",
+    "/verify",
+    "/forgot-password",
+  ].some((route) => pathname.startsWith(route));
+
+  if (authPage) {
+    return null;
+  }
 
 
   return (
