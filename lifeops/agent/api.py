@@ -2,7 +2,7 @@ import os
 import boto3
 
 from boto3.dynamodb.conditions import Attr
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
@@ -19,6 +19,7 @@ from lifeops.autonomy import (
 from lifeops.command_center import (CommandCenterService)
 from lifeops.timeline import (build_timeline)
 from lifeops.notifications import (build_notifications)
+from lifeops.auth import (require_user)
 
 app = FastAPI(
     title="LifeOps Agent API",
@@ -92,7 +93,7 @@ def dashboard(user_id: str = "demo-user"):
         raise HTTPException(status_code=500, detail=str(error))
 
 @app.get("/vault")
-def vault(user_id: str = "demo-user"):
+def vault(user_id: str = Depends(require_user)):
     try:
         life_objects = (
             get_user_items("DYNAMODB_LIFEOBJECTS_TABLE", user_id)
