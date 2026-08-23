@@ -1,3 +1,5 @@
+import { authFetch } from "./auth/auth-fetch";
+
 export type VaultCategory = 
     | "all"
     | "health"
@@ -31,7 +33,7 @@ export interface VaultData {
 }
 
 export async function getVault(): Promise<VaultData> {
-    const response = await fetch("/api/vault", {
+    const response = await authFetch("/api/vault", {
         cache: "no-store",
     });
 
