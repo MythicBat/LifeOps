@@ -6,14 +6,29 @@ import {
 const API_URL = process.env.LIFEOPS_AGENT_API
 
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
+
+    const authorization = request.headers.get("authorization");
+
+    if (!authorization) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Authentication required.",
+        },
+        {status: 401}
+      );
+    }
 
     const response =
       await fetch(
         `${API_URL}/vault`,
         {
           method: "GET",
+          headers: {
+            Authorization: authorization,
+          },
           cache: "no-store",
         }
       );
