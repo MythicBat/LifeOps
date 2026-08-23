@@ -9,6 +9,7 @@ import "./globals.css";
 import { CommandPalette } from "@/components/lifeops/CommandPalette";
 import { MobileNavigation } from "@/components/navigation/MobileNavigation";
 import { AuthInitializer } from "@/components/auth/AuthInitializer";
+import { AuthGuard } from "@/components/auth/AuthGuard";
 
 export const metadata: Metadata = {
   title: "LifeOps — Life, handled.",
@@ -26,7 +27,9 @@ export default function RootLayout({
       <body>
         <AuthInitializer />
         
-        {children}
+        <AuthGuard>
+          {children}
+        </AuthGuard>
 
         <MobileNavigation />
 
