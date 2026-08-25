@@ -9,9 +9,12 @@ from .models import (
 
 from .prompts import (
     OBSERVER_PROMPT,
+    AUTHORITATIVE_DATA_RULES,
+    JSON_OUTPUT_RULES,
 )
 
 from .tools.subscriptions import (find_latest_subscription)
+from .parsing import (AgentOutputError, extract_json_object)
 
 class LifeOpsObserver:
     def __init__(
@@ -43,22 +46,14 @@ Return only valid JSON matching:
   "summary": "...",
   "confidence": 0.0
 }}
+
+{AUTHORITATIVE_DATA_RULES}
+
+{JSON_OUTPUT_RULES}
 """
 
         response = self.agent(prompt)
-        text = str(response).strip()
-        text = text.removeprefix(
-            "```json"
-        )
-        text = text.removeprefix(
-            "```"
-        )
-        text = text.removesuffix(
-            "```"
-        )
-        data = json.loads(
-                text.strip()
-            )
+        data = extract_json_object(response)
 
         return ObservedEvent(
             **data
