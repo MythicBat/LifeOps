@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  Suspense,
   useState,
   type SyntheticEvent,
 } from "react";
@@ -22,6 +23,19 @@ import {
 
 
 export default function VerifyPage() {
+  return (
+    <Suspense
+      fallback={
+        <VerifyLoading />
+      }
+    >
+      <VerifyContent />
+    </Suspense>
+  );
+}
+
+
+function VerifyContent() {
   const router =
     useRouter();
 
@@ -36,31 +50,36 @@ export default function VerifyPage() {
   const [
     code,
     setCode,
-  ] = useState("");
+  ] =
+    useState("");
 
   const [
     loading,
     setLoading,
-  ] = useState(false);
+  ] =
+    useState(false);
 
   const [
     resending,
     setResending,
-  ] = useState(false);
+  ] =
+    useState(false);
 
   const [
     message,
     setMessage,
-  ] = useState<string | null>(
-    null,
-  );
+  ] =
+    useState<
+      string | null
+    >(null);
 
   const [
     error,
     setError,
-  ] = useState<string | null>(
-    null,
-  );
+  ] =
+    useState<
+      string | null
+    >(null);
 
 
   async function submit(
@@ -138,6 +157,11 @@ export default function VerifyPage() {
       );
 
     } catch (error) {
+      console.error(
+        "Resend verification error:",
+        error,
+      );
+
       setError(
         error instanceof Error
           ? error.message
@@ -168,9 +192,11 @@ export default function VerifyPage() {
           Verify your email
         </p>
 
+
         <h1 className="mt-3 text-3xl font-semibold tracking-[-0.045em] text-zinc-950">
           One last step.
         </h1>
+
 
         <p className="mt-3 text-sm leading-6 text-zinc-500">
 
@@ -197,6 +223,7 @@ export default function VerifyPage() {
             <span className="mb-2 block text-sm font-medium text-zinc-700">
               Verification code
             </span>
+
 
             <input
               value={
@@ -257,7 +284,7 @@ export default function VerifyPage() {
               code.length !== 6
             }
 
-            className="mt-6 flex h-12 w-full items-center justify-center gap-2 rounded-[17px] bg-zinc-950 text-sm font-medium text-white transition hover:bg-zinc-800 disabled:opacity-40"
+            className="mt-6 flex h-12 w-full items-center justify-center gap-2 rounded-[17px] bg-zinc-950 text-sm font-medium text-white transition hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-40"
           >
 
             {loading
@@ -265,9 +292,11 @@ export default function VerifyPage() {
               : "Verify email"}
 
             {!loading && (
+
               <ArrowRight
                 size={15}
               />
+
             )}
 
           </button>
@@ -276,6 +305,8 @@ export default function VerifyPage() {
 
 
         <button
+          type="button"
+
           onClick={
             resend
           }
@@ -287,10 +318,31 @@ export default function VerifyPage() {
 
           className="mt-5 w-full text-center text-sm font-medium text-zinc-400 transition hover:text-zinc-950 disabled:opacity-40"
         >
+
           {resending
             ? "Sending..."
             : "Resend verification code"}
+
         </button>
+
+      </div>
+
+    </main>
+  );
+}
+
+
+function VerifyLoading() {
+  return (
+    <main className="flex min-h-screen items-center justify-center bg-[#f5f5f7]">
+
+      <div className="text-center">
+
+        <div className="mx-auto h-10 w-10 animate-pulse rounded-[14px] bg-zinc-950" />
+
+        <p className="mt-4 text-sm text-zinc-400">
+          Opening verification...
+        </p>
 
       </div>
 
