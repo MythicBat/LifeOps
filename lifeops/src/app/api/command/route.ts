@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { authFetch } from "@/lib/auth/auth-fetch";
 
 export async function POST(request: Request) {
     try {
@@ -19,7 +20,7 @@ export async function POST(request: Request) {
             );
         }
 
-        const response = await fetch(`${agentApi}/command`, {
+        const response = await authFetch(`${agentApi}/command`, {
             method: "POST",
             headers: {
                 Authorization: authorization,
