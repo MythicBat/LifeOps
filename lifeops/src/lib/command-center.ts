@@ -39,7 +39,6 @@ export async function runLifeOpsCommand(command: string): Promise<LifeOpsCommand
         },
         body: JSON.stringify({
             command,
-            userId: "demo-user",
         }),
     });
 
