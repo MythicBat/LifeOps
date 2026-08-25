@@ -5,7 +5,8 @@ from .models import (
     LifeOpsPlan,
     ObservedEvent,
 )
-from .prompts import (PLANNER_PROMPT)
+from .prompts import (PLANNER_PROMPT, AUTHORITATIVE_DATA_RULES, JSON_OUTPUT_RULES)
+from .parsing import (extract_json_object)
 
 class LifeOpsPlanner:
     def __init__(self, model):
@@ -38,12 +39,12 @@ Return only valid JSON matching:
     ],
     "briefing": "..."
 }}
+
+{AUTHORITATIVE_DATA_RULES}
+
+{JSON_OUTPUT_RULES}
 """
         response = self.agent(prompt)
-        text = str(response).strip()
-        text = text.removeprefix("```json")
-        text = text.removeprefix("```")
-        text = text.removesuffix("```")
-        data = json.loads(text.strip())
+        data = extract_json_object(response)
 
         return LifeOpsPlan(**data)
