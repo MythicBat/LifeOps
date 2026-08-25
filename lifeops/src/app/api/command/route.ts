@@ -10,9 +10,19 @@ export async function POST(request: Request) {
             throw new Error("API is missing.");
         }
 
+        const authorization = request.headers.get("authorization");
+
+        if (!authorization) {
+            return NextResponse.json(
+                {success: false, error: "Authentication required"},
+                {status: 401},
+            );
+        }
+
         const response = await fetch(`${agentApi}/command`, {
             method: "POST",
             headers: {
+                Authorization: authorization,
                 "Content-Type": "application/json",
             },
             body: JSON.stringify(body),

@@ -3,7 +3,7 @@ import {
 } from "next/server";
 
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
     const agentApi =
       process.env
@@ -15,10 +15,22 @@ export async function GET() {
       );
     }
 
+    const authorization = request.headers.get("authorization");
+
+    if (!authorization) {
+      return NextResponse.json(
+        {succes: false, error: "Authentication required."},
+        {status: 401},
+      );
+    }
+
     const response =
       await fetch(
         `${agentApi}/autonomy`,
         {
+          headers: {
+            Authorization: authorization,
+          },
           cache: "no-store",
         },
       );

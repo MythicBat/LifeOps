@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-export async function GET() {
+export async function GET(request: Request) {
     try {
         const agentApi = process.env.LIFEOPS_AGENT_API;
 
@@ -8,7 +8,19 @@ export async function GET() {
             throw new Error("LIFEOPS_AGENT_API is missing.");
         }
 
+        const authorization = request.headers.get("authorization");
+
+        if (!authorization) {
+            return NextResponse.json(
+                {success: false, error: "Authentication required"},
+                {status: 401},
+            )
+        }
+
         const response = await fetch(`${agentApi}/dashboard`, {
+            headers: {
+                Authorization: authorization,
+            },
             cache: "no-store",
         });
 
