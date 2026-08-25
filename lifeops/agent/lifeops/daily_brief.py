@@ -130,10 +130,10 @@ class DailyBriefService:
 
                 for run in dashboard["recentRuns"]
             ],
-            "obligations": obligations,
-            "renewals": renewals,
-            "appointments": appointments,
-            "warranties": warranties,
+            "obligations": [item for item in obligations if item.get("status") == "open"],
+            "renewals": [item for item in renewals if item.get("status") == "upcoming"],
+            "appointments": [item for item in appointments if item.get("status") == "scheduled"],
+            "warranties": [item for item in warranties if item.get("status") == "active"],
             "pendingDecisions": [
                 item for item in decisions if item.get("status") == "pending"
             ],
