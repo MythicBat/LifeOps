@@ -51,10 +51,25 @@ Return only valid JSON matching:
 
 {JSON_OUTPUT_RULES}
 """
+        
+        try:
 
-        response = self.agent(prompt)
-        data = extract_json_object(response)
+            response = self.agent(prompt)
+            data = extract_json_object(response)
 
-        return ObservedEvent(
-            **data
-        )
+            return ObservedEvent(
+                **data
+            )
+        except Exception as error:
+            print("Observer fallback:", error)
+
+            return ObservedEvent(
+                eventType="document_detected",
+                category="general",
+                confidence=0.0,
+                summary=(
+                    f"Document from "
+                    f"{document.vendor or 'unknown source'}"
+                ),
+                requiresAttention=False,
+            )
