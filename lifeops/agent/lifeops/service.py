@@ -37,30 +37,13 @@ class LifeOpsService:
         self.planner = LifeOpsPlanner(self.model)
         self.executor = LifeOpsExecutor()
 
-    def process_document(self, document: DocumentAnalysis, user_id: str = "demo-user"):
+    def process_document(self, document: DocumentAnalysis, user_id: str):
         event = self.observer.observe(document)
-        subscription_change = None
 
+        subscripion_change = None
         planner_context = {}
-        
-        if subscription_change:
-            planner_context["subscription"] = subscription_change
-        plan = self.planner.plan(event, context=planner_context)
 
-        autonomy_settings = (get_autonomy_settings(user_id))
-        guardian = (evaluate_plan(plan, autonomy_settings))
-        execution = (
-            self.executor.execute(
-                user_id=user_id,
-                document=document,
-                plan=plan,
-                guardian=guardian,
-                autonomy_settings=autonomy_settings,
-                context=planner_context,
-            )
-        )
-
-        if (document.vendor and document.total):
+        if (document.vendor and document.total is not None):
             vendor_lower = (document.vendor.lower())
 
             known_subscriptions = [
@@ -78,8 +61,19 @@ class LifeOpsService:
             is_subscription = any(vendor in vendor_lower for vendor in known_subscriptions)
 
             if is_subscription:
-                previous = (find_latest_subscription(user_id=user_id, vendor=document.vendor))
-                subscription_change = (analyse_subscription_change(previous=previous, current_amount=document.total))
+                previous = (find_latest_subscription(
+                    user_id=user_id,
+                    vendor=document.vendor,
+                ))
+
+                subscription_change = (analyse_subscription_change(
+                    previous=previous,
+                    current_amount=document.total,
+                ))
+
+                if subscripion_change:
+                    planner_context["subscription"] = (subscripion_change)
+
                 record_subscription(
                     user_id=user_id,
                     vendor=document.vendor,
@@ -88,11 +82,28 @@ class LifeOpsService:
                     document_id=document.documentId,
                 )
 
+        plan = self.planner.plan(event, context=planner_context)
+
+        autonomy_settings = get_autonomy_settings(user_id)
+
+        guardian = evaluate_plan(plan, autonomy_settings)
+
+        execution = (
+            self.executor.execute(
+                user_id=user_id,
+                document=document,
+                plan=plan,
+                guardian=guardian,
+                autonomy_settings=autonomy_settings,
+                context=planner_context,
+            )
+        )
+
         return {
             "event": event.model_dump(),
             "plan": plan.model_dump(),
             "guardian": guardian.model_dump(),
             "execution": execution,
             "autonomy": autonomy_settings.model_dump(),
-            "intelligence": {"subscription", subscription_change}
+            "intelligence": {"subscription": subscripion_change},
         }

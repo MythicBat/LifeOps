@@ -39,12 +39,10 @@ class ResolveDecisionRequest(BaseModel):
 
 class AskLifeOpsRequest(BaseModel):
     message: str
-    userId: str = ("demo-user")
     sessionId: (str | None) = None
 
 class CommandRequest(BaseModel):
     command: str
-    userId: str = ("demo-user")
 
 region = os.getenv("AWS_REGION")
 dynamodb = boto3.resource("dynamodb", region_name=region)
@@ -61,7 +59,7 @@ def health():
     }
 
 @app.get("/decisions")
-def get_decisions(user_id: str = "demo-user"):
+def get_decisions(user_id: str = Depends(require_user)):
     try:
         table_name = os.getenv("DYNAMODB_DECISIONS_TABLE")
 
@@ -83,7 +81,7 @@ def get_decisions(user_id: str = "demo-user"):
         raise HTTPException(status_code=500, detail=str(error))
 
 @app.get("/dashboard")
-def dashboard(user_id: str = "demo-user"):
+def dashboard(user_id: str = Depends(require_user)):
     try:
         return {
             "success": True,
@@ -154,7 +152,8 @@ def vault(user_id: str = Depends(require_user)):
                 "type": "subscription",
                 "title": item.get("vendor", "Subscription"),
                 "subtitle": "Subscription",
-                "amount": item.get("currency", "AUD"),
+                "amount": item.get("amount"),
+                "currency": item.get("currency", "AUD"),
                 "date": item.get("createdAt"),
                 "status": item.get("status", "active"),
                 "raw": item,
@@ -231,7 +230,7 @@ def vault(user_id: str = Depends(require_user)):
         raise HTTPException(status_code=500, detail=str(error))
 
 @app.get("/upcoming")
-def upcoming(user_id: str = "demo-user"):
+def upcoming(user_id: str = Depends(require_user)):
     try:
         obligations = (
             get_user_items("DYNAMODB_OBLIGATIONS_TABLE", user_id)
@@ -307,7 +306,7 @@ def upcoming(user_id: str = "demo-user"):
         raise HTTPException(status_code=500, detail=str(error))
 
 @app.get("/notifications")
-def notifications(user_id: str = "demo-user"):
+def notifications(user_id: str = Depends(require_user)):
     try:
         return {
             "success": True,
@@ -317,7 +316,7 @@ def notifications(user_id: str = "demo-user"):
         raise HTTPException(status_code=500, detail=str(error))
 
 @app.get("/graph")
-def graph(user_id: str = "demo-user"):
+def graph(user_id: str = Depends(require_user)):
     try:
         return {
             "success": True,
@@ -327,7 +326,7 @@ def graph(user_id: str = "demo-user"):
         raise HTTPException(status_code=500, detail=str(error))
 
 @app.get("/daily-brief")
-def daily_brief(user_id: str = "demo-user"):
+def daily_brief(user_id: str = Depends(require_user)):
     try:
         brief = (daily_brief_service.generate(user_id))
 
@@ -339,7 +338,7 @@ def daily_brief(user_id: str = "demo-user"):
         raise HTTPException(status_code=500, detail=str(error))
 
 @app.get("/timeline")
-def timeline(user_id: str = "demo-user"):
+def timeline(user_id: str = Depends(require_user)):
     try:
         return {
             "success": True,
@@ -349,7 +348,7 @@ def timeline(user_id: str = "demo-user"):
         raise HTTPException(status_code=500, detail=str(error))
 
 @app.get("/autonomy")
-def autonomy(user_id: str = "demo-user"):
+def autonomy(user_id: str = Depends(require_user)):
     settings = (
         get_autonomy_settings(user_id)
     )
@@ -362,7 +361,7 @@ def autonomy(user_id: str = "demo-user"):
 @app.put("/autonomy")
 def update_autonomy(
     settings: AutonomySettings,
-    user_id: str = "demo-user",
+    user_id: str = Depends(require_user),
 ):
     saved = save_autonomy_settings(
         user_id=user_id,
@@ -375,11 +374,11 @@ def update_autonomy(
     }
 
 @app.post("/process-document")
-def process_document(document: DocumentAnalysis):
+def process_document(document: DocumentAnalysis, user_id: str = Depends(require_user)):
     try:
         result = lifeops.process_document(
             document=document,
-            user_id="demo-user",
+            user_id=user_id,
         )
 
         return {
@@ -395,13 +394,22 @@ def process_document(document: DocumentAnalysis):
         )
 
 @app.post("/decisions/{decision_id}/resolve")
-def resolve_decision(decision_id: str, request: ResolveDecisionRequest):
+def resolve_decision(decision_id: str, request: ResolveDecisionRequest, user_id: str = Depends(require_user)):
     table_name = os.getenv("DYNAMODB_DECISIONS_TABLE")
 
     if not table_name:
         raise HTTPException(status_code=500, detail=("Decision table is not configured"))
 
     table = dynamodb.Table(table_name)
+
+    existing = table.get_item(
+        Key={
+            "id": decision_id
+        }
+    ).get("Item")
+
+    if (not existing or existing.get("userId") != user_id):
+        raise HTTPException(status_code=400, detail="Decision not found.")
 
     response = table.update_item(
         Key={
@@ -431,13 +439,13 @@ def resolve_decision(decision_id: str, request: ResolveDecisionRequest):
     }
 
 @app.post("/ask")
-def ask(request: AskLifeOpsRequest):
+def ask(request: AskLifeOpsRequest, user_id: str = Depends(require_user)):
     try:
         return {
             "success": True,
 
             **ask_lifeops(
-                user_id=request.userId,
+                user_id=user_id,
                 message=request.message,
                 session_id=request.sessionId,
             ),
@@ -446,10 +454,10 @@ def ask(request: AskLifeOpsRequest):
         raise HTTPException(status_code=500, detail=str(error))
 
 @app.post("/command")
-def command(request: CommandRequest):
+def command(request: CommandRequest, user_id: str = Depends(require_user)):
     try:
         result = (command_center.run(
-            user_id=request.userId,
+            user_id=user_id,
             command=request.command,
         ))
 
