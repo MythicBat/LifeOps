@@ -4,10 +4,19 @@ import os
 from strands import Agent
 from strands.models import BedrockModel
 
-from .dashboard import (get_user_items)
-from .models import (LifeOpsCommandResult)
+from .dashboard import get_user_items
+from .models import (
+    CommandMetric,
+    LifeOpsCommandResult,
+)
+from .parsing import extract_json_object
+from .prompts import (
+    AUTHORITATIVE_DATA_RULES,
+    JSON_OUTPUT_RULES,
+)
 
-COMMAND_PROMPT = """
+
+COMMAND_PROMPT = f"""
 You are the LifeOps Command Center.
 
 You receive authoritative operational state
@@ -30,6 +39,10 @@ IMPORTANT:
 - Pending decisions should be clearly separated.
 - Financial calculations provided in state are
   authoritative. Do not recalculate or guess them.
+- Do not invent financial metrics.
+- Do not invent savings.
+- Do not change deterministic counts supplied
+  by application code.
 
 For "Clean up my month":
 
@@ -42,41 +55,58 @@ For "Clean up my month":
 7. Summarise what is already under control.
 8. Highlight only the items the user must act on.
 
-Return ONLY valid JSON matching:
+Return exactly this JSON structure:
 
-{
-  "title": "...",
-  "summary": "...",
+{{
+  "title": "string",
+  "summary": "string",
   "reviewedCount": 0,
   "handledCount": 0,
   "attentionCount": 0,
-  "metrics": [
-    {
-      "label": "...",
-      "value": "..."
-    }
-  ],
+  "metrics": [],
   "items": [
-    {
-      "id": "...",
+    {{
+      "id": null,
       "type": "decision",
-      "title": "...",
-      "description": "...",
-      "value": "...",
+      "title": "string",
+      "description": "string",
+      "value": null,
       "actionLabel": "Review",
-      "decisionId": "..."
-    }
+      "decisionId": null
+    }}
   ]
-}
+}}
+
+Allowed item types:
+
+- handled
+- attention
+- decision
+- upcoming
+- saving
+- info
+
+{AUTHORITATIVE_DATA_RULES}
+
+{JSON_OUTPUT_RULES}
 """
+
 
 class CommandCenterService:
     def __init__(self):
-        region = os.getenv("AWS_REGION")
-        model_id = os.getenv("BEDROCK_MODEL_ID")
+        region = os.getenv(
+            "AWS_REGION",
+            "ap-southeast-2",
+        )
+
+        model_id = os.getenv(
+            "BEDROCK_MODEL_ID"
+        )
 
         if not model_id:
-            raise RuntimeError("BEDROCK ID is missing.")
+            raise RuntimeError(
+                "BEDROCK_MODEL_ID is missing."
+            )
 
         self.agent = Agent(
             model=BedrockModel(
@@ -86,6 +116,7 @@ class CommandCenterService:
             ),
             system_prompt=COMMAND_PROMPT,
         )
+
 
     def build_state(
         self,
@@ -173,46 +204,281 @@ class CommandCenterService:
                 )[:10],
         }
 
-    def run(self, user_id: str, command: str) -> LifeOpsCommandResult:
-        state = self.build_state(user_id)
+
+    def run(
+        self,
+        user_id: str,
+        command: str,
+    ) -> LifeOpsCommandResult:
+
+        state = self.build_state(
+            user_id
+        )
+
+
+        # --------------------------------
+        # DETERMINISTIC COUNTS
+        # --------------------------------
+
         reviewed_count = sum([
-            len(state["obligations"]),
-            len(state["decisions"]),
-            len(state["subscriptions"]),
-            len(state["warranties"]),
-            len(state["renewals"]),
-            len(state["appointments"]),
+            len(
+                state[
+                    "obligations"
+                ]
+            ),
+            len(
+                state[
+                    "decisions"
+                ]
+            ),
+            len(
+                state[
+                    "subscriptions"
+                ]
+            ),
+            len(
+                state[
+                    "warranties"
+                ]
+            ),
+            len(
+                state[
+                    "renewals"
+                ]
+            ),
+            len(
+                state[
+                    "appointments"
+                ]
+            ),
         ])
-        attention_count = len(state["decisions"])
+
+
+        attention_count = len(
+            state[
+                "decisions"
+            ]
+        )
+
+
+        # Count recent successful handled actions
+        handled_count = 0
+
+        for run in state[
+            "recentRuns"
+        ]:
+            actions = (
+                run.get(
+                    "actions",
+                    []
+                )
+                or []
+            )
+
+            handled_count += len(
+                actions
+            )
+
+
+        # --------------------------------
+        # DETERMINISTIC FINANCIAL IMPACT
+        # --------------------------------
+
+        known_annual_impact = 0.0
+
+
+        for decision in state[
+            "decisions"
+        ]:
+
+            metadata = (
+                decision.get(
+                    "metadata",
+                    {}
+                )
+                or {}
+            )
+
+            annual = metadata.get(
+                "annualImpact"
+            )
+
+            if annual is None:
+                continue
+
+            try:
+                annual_value = float(
+                    annual
+                )
+
+            except (
+                TypeError,
+                ValueError,
+            ):
+                continue
+
+            if annual_value > 0:
+                known_annual_impact += (
+                    annual_value
+                )
+
+
+        deterministic_metrics = {
+            "reviewedCount":
+                reviewed_count,
+
+            "handledCount":
+                handled_count,
+
+            "attentionCount":
+                attention_count,
+
+            "knownAnnualImpact":
+                round(
+                    known_annual_impact,
+                    2,
+                ),
+        }
+
+
+        # --------------------------------
+        # MODEL
+        # --------------------------------
 
         prompt = f"""
 USER COMMAND:
 
 {command}
 
+
 AUTHORITATIVE LIFE STATE:
 
 {json.dumps(
     state,
     indent=2,
-    default=str
+    default=str,
 )}
+
+
+DETERMINISTIC METRICS:
+
+{json.dumps(
+    deterministic_metrics,
+    indent=2,
+)}
+
+
+The values in DETERMINISTIC METRICS are authoritative.
+
+Do not change:
+- reviewedCount
+- handledCount
+- attentionCount
+
+Do not create financial metrics that are not
+present in DETERMINISTIC METRICS.
+
+If knownAnnualImpact is 0, do not claim there
+are savings or annual financial impact.
 """
-        response = self.agent(prompt)
 
-        text = str(response).strip()
 
-        text = text.removeprefix("```json")
+        response = self.agent(
+            prompt
+        )
 
-        text = text.removeprefix("```")
 
-        text.removesuffix("```")
+        data = extract_json_object(
+            response
+        )
 
-        data = json.loads(text.strip())
 
-        result = (LifeOpsCommandResult(**data))
+        result = LifeOpsCommandResult(
+            **data
+        )
 
-        result.reviewedCount = (reviewed_count)
-        result.attentionCount = (attention_count)
+
+        # --------------------------------
+        # OVERRIDE MODEL-CONTROLLED FACTS
+        # --------------------------------
+
+        result.reviewedCount = (
+            reviewed_count
+        )
+
+        result.handledCount = (
+            handled_count
+        )
+
+        result.attentionCount = (
+            attention_count
+        )
+
+
+        # --------------------------------
+        # BUILD METRICS OURSELVES
+        # --------------------------------
+
+        result.metrics = []
+
+
+        if attention_count > 0:
+            result.metrics.append(
+                CommandMetric(
+                    label=
+                        "Needs you",
+
+                    value=
+                        str(
+                            attention_count
+                        ),
+                )
+            )
+
+
+        if known_annual_impact > 0:
+            result.metrics.append(
+                CommandMetric(
+                    label=
+                        "Known annual impact",
+
+                    value=(
+                        f"${known_annual_impact:.2f}/year"
+                    ),
+                )
+            )
+
+
+        # --------------------------------
+        # UI-SAFETY LIMITS
+        # --------------------------------
+
+        result.title = (
+            result.title[
+                :120
+            ]
+        )
+
+        result.summary = (
+            result.summary[
+                :600
+            ]
+        )
+
+
+        for item in result.items:
+            item.title = (
+                item.title[
+                    :120
+                ]
+            )
+
+            if item.description:
+                item.description = (
+                    item.description[
+                        :700
+                    ]
+                )
+
 
         return result
