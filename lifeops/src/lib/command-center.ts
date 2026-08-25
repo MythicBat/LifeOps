@@ -1,3 +1,5 @@
+import { authFetch } from "./auth/auth-fetch";
+
 export interface CommandMetric {
     label: string;
     value: string;
@@ -30,7 +32,7 @@ export interface LifeOpsCommandResult {
 }
 
 export async function runLifeOpsCommand(command: string): Promise<LifeOpsCommandResult> {
-    const response = await fetch("/api/command", {
+    const response = await authFetch("/api/command", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",

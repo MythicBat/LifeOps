@@ -1,3 +1,5 @@
+import { authFetch } from "./auth/auth-fetch";
+
 export type TimelineKind = 
     | "activity"
     | "obligation"
@@ -17,7 +19,7 @@ export interface TimelineItem {
 }
 
 export async function getTimeline(): Promise<TimelineItem[]> {
-    const response = await fetch("/api/timeline", {
+    const response = await authFetch("/api/timeline", {
         cache: "no-store",
     });
 

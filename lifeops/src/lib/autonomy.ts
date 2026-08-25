@@ -1,3 +1,5 @@
+import { authFetch } from "./auth/auth-fetch";
+
 export type AutonomyMode =
   | "auto"
   | "ask"
@@ -32,7 +34,7 @@ export async function getAutonomy():
   Promise<AutonomySettings> {
 
   const response =
-    await fetch(
+    await authFetch(
       "/api/autonomy",
       {
         cache:

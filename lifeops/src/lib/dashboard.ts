@@ -1,3 +1,5 @@
+import { authFetch } from "./auth/auth-fetch";
+
 export interface DashboardCounts {
     lifeObjects: number;
     obligations: number;
@@ -24,7 +26,7 @@ export interface DashboardData {
 }
 
 export async function getDashboard(): Promise<DashboardData> {
-    const response = await fetch("/api/dashboard", {
+    const response = await authFetch("/api/dashboard", {
         cache: "no-store",
     });
 
