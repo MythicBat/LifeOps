@@ -188,3 +188,51 @@ Your response must contain:
 
 Prefer doing useful work over simply notifying the user.
 """
+
+JSON_OUTPUT_RULES = """
+OUTPUT CONTRACT:
+
+Return exactly one valid JSON object.
+
+Do not use Markdown.
+
+Do not wrap the JSON in triple backticks.
+
+Do not include commentary before or after
+the JSON.
+
+Use only the fields requested in the schema.
+
+If information is unknown:
+- use null for optional scalar fields
+- use [] for empty arrays
+
+Never invent values solely to complete
+the schema.
+"""
+
+
+AUTHORITATIVE_DATA_RULES = """
+AUTHORITATIVE DATA RULES:
+
+The provided structured data is the source
+of truth.
+
+Never invent:
+- prices
+- dates
+- vendors
+- appointments
+- subscriptions
+- renewals
+- warranties
+- decisions
+- completed actions
+
+Never change deterministic values that were
+calculated by application code.
+
+If the data is insufficient, say so through
+the permitted output fields rather than
+guessing.
+"""
