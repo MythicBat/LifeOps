@@ -3,6 +3,7 @@
 import { ArrowUpRight, Sparkles } from "lucide-react";
 
 import type { LifeOpsDecision } from "@/lib/decisions";
+import { authFetch } from "@/lib/auth/auth-fetch";
 
 export function DecisionCard({decision, onResolved,}: { decision: LifeOpsDecision; onResolved?: () => void; }) {
   const vendor = decision.metadata?.vendor;
@@ -14,7 +15,7 @@ export function DecisionCard({decision, onResolved,}: { decision: LifeOpsDecisio
   const percentageChange = decision.metadata?.percentageChange;
 
   const resolve = async (option: string) => {
-    const response = await fetch(`/api/decisions/${decision.id}/resolve`,
+    const response = await authFetch(`/api/decisions/${decision.id}/resolve`,
       {
         method: "POST",
         headers: {

@@ -2,12 +2,13 @@
 
 import { useEffect, useState } from "react";
 import { Sparkles } from "lucide-react";
+import { authFetch } from "@/lib/auth/auth-fetch";
 
 export function DailyBrief() {
     const [brief, setBrief] = useState<string | null>(null);
 
     useEffect(() => {
-        fetch("/api/daily-brief").then((response) => response.json())
+        authFetch("/api/daily-brief").then((response) => response.json())
             .then((data) => setBrief(data.brief)).catch(console.error);
     }, []);
 

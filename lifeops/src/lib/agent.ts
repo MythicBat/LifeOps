@@ -1,3 +1,4 @@
+import { authFetch } from "./auth/auth-fetch";
 import type { LifeOpsDocumentAnalysis } from "./document-intelligence";
 
 export interface ObservedEvent {
@@ -43,7 +44,7 @@ export interface AgentProcessingResult {
 export async function processWithLifeOpsAgent(
     analysis: LifeOpsDocumentAnalysis
 ): Promise<AgentProcessingResult> {
-    const response = await fetch("/api/agent/process-document",
+    const response = await authFetch("/api/agent/process-document",
         {
             method: "POST",
             headers: {

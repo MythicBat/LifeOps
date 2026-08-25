@@ -1,3 +1,4 @@
+import { authFetch } from "./auth/auth-fetch";
 import type { LifeOpsDocumentAnalysis } from "./document-intelligence";
 
 export interface UploadedDocument {
@@ -13,7 +14,7 @@ interface PresignResponse {
 }
 
 export async function uploadToLifeOps(file: File): Promise<UploadedDocument> {
-    const presignResponse = await fetch("/api/uploads/presign",
+    const presignResponse = await authFetch("/api/uploads/presign",
         {
             method: "POST",
             headers: {
@@ -39,7 +40,7 @@ export async function uploadToLifeOps(file: File): Promise<UploadedDocument> {
         objectKey,
     } = presignData as PresignResponse;
 
-    const uploadResponse = await fetch(uploadUrl, {
+    const uploadResponse = await authFetch(uploadUrl, {
         method: "PUT",
         headers: {
             "Content-Type": file.type,
@@ -58,7 +59,7 @@ export async function uploadToLifeOps(file: File): Promise<UploadedDocument> {
 }
 
 export async function analyseLifeOpsDocument(document: UploadedDocument): Promise<LifeOpsDocumentAnalysis> {
-    const response = await fetch("/api/documents/analyse",
+    const response = await authFetch("/api/documents/analyse",
         {
             method: "POST",
             headers: {

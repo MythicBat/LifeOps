@@ -1,3 +1,4 @@
+import { authFetch } from "@/lib/auth/auth-fetch";
 import {
   NextResponse,
 } from "next/server";
@@ -25,7 +26,7 @@ export async function GET(request: Request) {
     }
 
     const response =
-      await fetch(
+      await authFetch(
         `${agentApi}/autonomy`,
         {
           headers: {
@@ -77,7 +78,7 @@ export async function PUT(
     }
 
     const response =
-      await fetch(
+      await authFetch(
         `${agentApi}/autonomy`,
         {
           method: "PUT",

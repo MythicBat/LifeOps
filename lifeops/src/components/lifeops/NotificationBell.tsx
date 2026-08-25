@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 
 import { useRouter } from "next/navigation";
+import { authFetch } from "@/lib/auth/auth-fetch";
 
 
 interface Notification {
@@ -51,7 +52,7 @@ export function NotificationBell() {
 
   useEffect(() => {
 
-    fetch(
+    authFetch(
       "/api/notifications"
     )
       .then(

@@ -1,3 +1,5 @@
+import { authFetch } from "./auth/auth-fetch";
+
 export interface LifeOpsDecision {
     id: string;
     userId: string;
@@ -20,7 +22,7 @@ export interface LifeOpsDecision {
 }
 
 export async function getDecisions(): Promise<LifeOpsDecision[]> {
-    const response = await fetch("/api/decisions", {
+    const response = await authFetch("/api/decisions", {
         cache: "no-store",
     });
 

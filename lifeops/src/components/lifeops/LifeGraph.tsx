@@ -10,6 +10,7 @@ import {
 } from "@xyflow/react";
 
 import "@xyflow/react/dist/style.css";
+import { authFetch } from "@/lib/auth/auth-fetch";
 
 interface GraphNode {
     id: string;
@@ -30,7 +31,7 @@ export function LifeGraph() {
     } | null>(null);
 
     useEffect(() => {
-        fetch("/api/graph").then((response) => response.json())
+        authFetch("/api/graph").then((response) => response.json())
             .then((data) => setGraph(data.graph)).catch(console.error);
     }, []);
 

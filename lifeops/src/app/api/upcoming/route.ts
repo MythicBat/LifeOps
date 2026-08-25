@@ -1,3 +1,4 @@
+import { authFetch } from "@/lib/auth/auth-fetch";
 import { NextResponse } from "next/server";
 
 export async function GET(request: Request) {
@@ -20,7 +21,7 @@ export async function GET(request: Request) {
     }
 
     try {
-        const response = await fetch(`${agentApi}/upcoming`, {
+        const response = await authFetch(`${agentApi}/upcoming`, {
             headers: {
                 Authorization: authorization,
             },

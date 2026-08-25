@@ -62,7 +62,7 @@ export async function saveAutonomy(
   Promise<AutonomySettings> {
 
   const response =
-    await fetch(
+    await authFetch(
       "/api/autonomy",
       {
         method:

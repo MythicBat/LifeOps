@@ -1,3 +1,4 @@
+import { authFetch } from "@/lib/auth/auth-fetch";
 import { NextResponse } from "next/server";
 
 export async function POST(
@@ -26,7 +27,7 @@ export async function POST(
             );
         }
 
-        const response = await fetch(`${agentApi}/decisions/${id}/resolve`,
+        const response = await authFetch(`${agentApi}/decisions/${id}/resolve`,
             {
                 method: "POST",
                 headers: {

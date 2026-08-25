@@ -6,6 +6,7 @@ import { ArrowUp, Sparkles } from "lucide-react";
 
 import { runLifeOpsCommand, type LifeOpsCommandResult } from "@/lib/command-center";
 import { CommandResult } from "./CommandResult";
+import { authFetch } from "@/lib/auth/auth-fetch";
 
 interface Message {
     role: "user" | "assistant";
@@ -85,14 +86,13 @@ export function AskLifeOps({initialCommand}: {initialCommand?: string | null;}) 
                 return;
             }
 
-            const response = await fetch("/api/ask", {
+            const response = await authFetch("/api/ask", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
                     message,
-                    userId: "demo-user",
                     sessionId,
                 }),
             });

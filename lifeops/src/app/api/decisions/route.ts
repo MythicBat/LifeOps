@@ -1,3 +1,4 @@
+import { authFetch } from "@/lib/auth/auth-fetch";
 import { NextResponse } from "next/server";
 
 export async function GET() {
@@ -8,7 +9,7 @@ export async function GET() {
             throw new Error("LIFEOPS_AGENT_API is not configured");
         }
 
-        const response = await fetch(`${agentApi}/decisions`, {
+        const response = await authFetch(`${agentApi}/decisions`, {
             cache: "no-store",
         },);
 
