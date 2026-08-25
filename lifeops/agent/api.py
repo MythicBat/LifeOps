@@ -441,29 +441,52 @@ def resolve_decision(decision_id: str, request: ResolveDecisionRequest, user_id:
 @app.post("/ask")
 def ask(request: AskLifeOpsRequest, user_id: str = Depends(require_user)):
     try:
+        message = (request.message.strip())
+
+        if not message:
+            raise HTTPException(status_code=400, detail="Message is required.")
+
+        if len(message) > 4000:
+            raise HTTPException(status_code=400, detail="Message is too long.")
+        
         return {
             "success": True,
 
             **ask_lifeops(
                 user_id=user_id,
-                message=request.message,
+                message=message,
                 session_id=request.sessionId,
             ),
         }
+    except HTTPException:
+        raise
     except Exception as error:
-        raise HTTPException(status_code=500, detail=str(error))
+        print("Ask LifeOps error:", repr(error))
+
+        raise HTTPException(status_code=503, detail=("LifeOps intelligence is temporarily unavailable"))
 
 @app.post("/command")
 def command(request: CommandRequest, user_id: str = Depends(require_user)):
     try:
+        command_text = (request.command).strip()
+
+        if not command_text:
+            raise HTTPException(status_code=400, detail="Command required")
+
+        if len(command_text) > 1000:
+            raise HTTPException(status_code=400, detail="Command is too long.")
+        
         result = (command_center.run(
             user_id=user_id,
-            command=request.command,
+            command=command_text,
         ))
 
         return {
             "success": True,
             "result": result.model_dump()
         }
+    except HTTPException:
+        raise
     except Exception as error:
-        raise HTTPException(status_code=500, detail=str(error))
+        print("Command Center error:", repr(error))
+        raise HTTPException(status_code=503, detail="LifeOps Command Center is temporarily unavailable.")

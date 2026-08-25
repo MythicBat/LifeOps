@@ -7,6 +7,25 @@ from ..database import (
     utc_now,
 )
 
+from boto3.dynamodb.conditions import Attr
+
+def document_already_processed(
+        user_id: str,
+        document_id: str,
+) -> bool:
+    table = get_table("DYNAMODB_LIFEOBJECTS_TABLE")
+
+    response = table.scan(
+        FilterExpression=(
+            Attr("userId").eq(user_id) &
+            Attr("documentId").eq(document_id)
+        )
+    )
+
+    return bool(
+        response.get("Items")
+    )
+
 @tool
 def create_life_object(
     user_id: str,

@@ -57,9 +57,11 @@ Return only valid JSON matching:
             response = self.agent(prompt)
             data = extract_json_object(response)
 
-            return ObservedEvent(
-                **data
-            )
+            event = ObservedEvent(**data)
+
+            event.summary = (event.summary[:400])
+
+            return event
         except Exception as error:
             print("Observer fallback:", error)
 

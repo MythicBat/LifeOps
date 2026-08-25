@@ -47,4 +47,12 @@ Return only valid JSON matching:
         response = self.agent(prompt)
         data = extract_json_object(response)
 
-        return LifeOpsPlan(**data)
+        plan = LifeOpsPlan(**data)
+        plan = (plan.goal[:160])
+        plan.briefing = (plan.briefing[:700])
+
+        for action in plan.actions:
+            if action.reason:
+                action.reason = (action.reason[:400])
+
+        return plan

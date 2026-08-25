@@ -13,6 +13,7 @@ from .tools.subscriptions import (
     record_subscription,
 )
 from .autonomy import (get_autonomy_settings)
+from .tools.life_objects import (document_already_processed)
 
 load_dotenv()
 
@@ -38,6 +39,12 @@ class LifeOpsService:
         self.executor = LifeOpsExecutor()
 
     def process_document(self, document: DocumentAnalysis, user_id: str):
+        if (document.documentId and document_already_processed(user_id, document.documentId)):
+            return {
+                "duplicate": True,
+                "message": "Document already processed.",
+            }
+        
         event = self.observer.observe(document)
 
         subscripion_change = None
