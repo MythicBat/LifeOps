@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  Suspense,
   useState,
   type SyntheticEvent,
 } from "react";
@@ -13,6 +14,7 @@ import {
 } from "lucide-react";
 
 import Link from "next/link";
+
 import {
   useRouter,
   useSearchParams,
@@ -24,47 +26,89 @@ import {
 
 
 export default function LoginPage() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
+  return (
+    <Suspense
+      fallback={
+        <LoginLoading />
+      }
+    >
+      <LoginContent />
+    </Suspense>
+  );
+}
+
+
+function LoginContent() {
+  const router =
+    useRouter();
+
+  const searchParams =
+    useSearchParams();
 
   const verified =
-    searchParams.get("verified") === "1";
+    searchParams.get(
+      "verified"
+    ) === "1";
 
   const initialEmail =
-    searchParams.get("email") ?? "";
+    searchParams.get(
+      "email"
+    ) ?? "";
 
-  const [email, setEmail] =
-    useState(initialEmail);
+  const [
+    email,
+    setEmail,
+  ] =
+    useState(
+      initialEmail
+    );
 
-  const [password, setPassword] =
+  const [
+    password,
+    setPassword,
+  ] =
     useState("");
 
-  const [showPassword, setShowPassword] =
+  const [
+    showPassword,
+    setShowPassword,
+  ] =
     useState(false);
 
-  const [loading, setLoading] =
+  const [
+    loading,
+    setLoading,
+  ] =
     useState(false);
 
-  const [error, setError] =
-    useState<string | null>(null);
+  const [
+    error,
+    setError,
+  ] =
+    useState<
+      string | null
+    >(null);
 
 
   async function submit(
-    event: SyntheticEvent<HTMLFormElement>,
+    event:
+      SyntheticEvent<HTMLFormElement>,
   ) {
     event.preventDefault();
 
     setError(null);
 
     const normalizedEmail =
-      email.trim().toLowerCase();
+      email
+        .trim()
+        .toLowerCase();
 
     if (
       !normalizedEmail ||
       !password
     ) {
       setError(
-        "Enter your email and password.",
+        "Enter your email and password."
       );
 
       return;
@@ -82,29 +126,34 @@ export default function LoginPage() {
         });
 
       const step =
-        result.nextStep.signInStep;
+        result
+          .nextStep
+          .signInStep;
 
       if (
         step === "DONE"
       ) {
-        router.replace("/");
+        router.replace(
+          "/"
+        );
+
         return;
       }
 
       setError(
-        `Additional sign-in step required: ${step}`,
+        `Additional sign-in step required: ${step}`
       );
 
     } catch (error) {
       console.error(
         "Login error:",
-        error,
+        error
       );
 
       setError(
         error instanceof Error
           ? error.message
-          : "Unable to sign in.",
+          : "Unable to sign in."
       );
 
     } finally {
@@ -215,7 +264,9 @@ export default function LoginPage() {
 
 
               <form
-                onSubmit={submit}
+                onSubmit={
+                  submit
+                }
                 className="mt-9 space-y-5"
               >
 
@@ -228,12 +279,14 @@ export default function LoginPage() {
                   <input
                     type="email"
 
-                    value={email}
+                    value={
+                      email
+                    }
 
                     onChange={
                       (event) =>
                         setEmail(
-                          event.target.value,
+                          event.target.value
                         )
                     }
 
@@ -274,12 +327,14 @@ export default function LoginPage() {
                           : "password"
                       }
 
-                      value={password}
+                      value={
+                        password
+                      }
 
                       onChange={
                         (event) =>
                           setPassword(
-                            event.target.value,
+                            event.target.value
                           )
                       }
 
@@ -293,20 +348,30 @@ export default function LoginPage() {
                     <button
                       type="button"
 
+                      aria-label={
+                        showPassword
+                          ? "Hide password"
+                          : "Show password"
+                      }
+
                       onClick={
                         () =>
                           setShowPassword(
                             (current) =>
-                              !current,
+                              !current
                           )
                       }
 
                       className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-400 transition hover:text-zinc-700"
                     >
                       {showPassword ? (
-                        <EyeOff size={17} />
+                        <EyeOff
+                          size={17}
+                        />
                       ) : (
-                        <Eye size={17} />
+                        <Eye
+                          size={17}
+                        />
                       )}
                     </button>
 
@@ -327,16 +392,20 @@ export default function LoginPage() {
                 <button
                   type="submit"
 
-                  disabled={loading}
+                  disabled={
+                    loading
+                  }
 
-                  className="flex h-12 w-full items-center justify-center gap-2 rounded-[17px] bg-zinc-950 px-5 text-sm font-medium text-white transition hover:bg-zinc-800 disabled:opacity-50"
+                  className="flex h-12 w-full items-center justify-center gap-2 rounded-[17px] bg-zinc-950 px-5 text-sm font-medium text-white transition hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {loading
                     ? "Signing in..."
                     : "Sign in"}
 
                   {!loading && (
-                    <ArrowRight size={15} />
+                    <ArrowRight
+                      size={15}
+                    />
                   )}
                 </button>
 
@@ -361,6 +430,25 @@ export default function LoginPage() {
           </section>
 
         </div>
+
+      </div>
+
+    </main>
+  );
+}
+
+
+function LoginLoading() {
+  return (
+    <main className="flex min-h-screen items-center justify-center bg-[#f5f5f7]">
+
+      <div className="text-center">
+
+        <div className="mx-auto h-10 w-10 animate-pulse rounded-[14px] bg-zinc-950" />
+
+        <p className="mt-4 text-sm text-zinc-400">
+          Opening LifeOps...
+        </p>
 
       </div>
 
