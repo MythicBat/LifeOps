@@ -48,7 +48,7 @@ Return only valid JSON matching:
         data = extract_json_object(response)
 
         plan = LifeOpsPlan(**data)
-        plan = (plan.goal[:160])
+        plan.goal = (plan.goal[:160])
         plan.briefing = (plan.briefing[:700])
 
         for action in plan.actions:

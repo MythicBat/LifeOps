@@ -43,7 +43,7 @@ def create_life_object(
     everyday-life objects.
     """
 
-    table = get_table("DYNAMBODB_LIFEOBJECTS_TABLE")
+    table = get_table("DYNAMODB_LIFEOBJECTS_TABLE")
     object_id = new_id("obj")
     item = {
         "id": object_id,

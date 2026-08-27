@@ -41,10 +41,12 @@ Analyse this LifeOps document event:
 Return only valid JSON matching:
 
 {{
-  "eventType": "...",
-  "title": "...",
-  "summary": "...",
-  "confidence": 0.0
+  "eventType": "string",
+  "category": "string",
+  "title": "short human-readable title",
+  "summary": "short factual summary",
+  "confidence": 0.0,
+  "requiresAttention": false 
 }}
 
 {AUTHORITATIVE_DATA_RULES}
@@ -59,6 +61,8 @@ Return only valid JSON matching:
 
             event = ObservedEvent(**data)
 
+            event.title = (event.title[:120])
+
             event.summary = (event.summary[:400])
 
             return event
@@ -68,6 +72,7 @@ Return only valid JSON matching:
             return ObservedEvent(
                 eventType="document_detected",
                 category="general",
+                title=(f"{document.vendor} document" if document.vendor else "Document detected"),
                 confidence=0.0,
                 summary=(
                     f"Document from "

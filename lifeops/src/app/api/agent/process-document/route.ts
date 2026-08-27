@@ -2,6 +2,16 @@ import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
     try {
+
+        const authorization = request.headers.get("authorization");
+
+        if (!authorization) {
+            return NextResponse.json(
+                {success: false, error: "Authentication required"},
+                {status: 401},
+            );
+        }
+
         const body = await request.json();
 
         const agentAPI = process.env.LIFEOPS_AGENT_API;
@@ -15,6 +25,7 @@ export async function POST(request: Request) {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
+                    Authorization: authorization,
                 },
                 body: JSON.stringify(body),
                 cache: "no-store",
@@ -27,7 +38,7 @@ export async function POST(request: Request) {
             return NextResponse.json(
                 {
                     error: "LifeOps agent failed.",
-                    detail: data.detatil ?? "Unknown agent error",
+                    detail: data.detail ?? "Unknown agent error",
                 },
                 {status: response.status}
             );

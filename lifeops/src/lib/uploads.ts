@@ -40,16 +40,16 @@ export async function uploadToLifeOps(file: File): Promise<UploadedDocument> {
         objectKey,
     } = presignData as PresignResponse;
 
-    const uploadResponse = await authFetch(uploadUrl, {
+    const uploadResponse = await fetch(uploadUrl, {
         method: "PUT",
         headers: {
-            "Content-Type": file.type,
+            "Content-Type": file.type || "application/octet-stream",
         },
         body: file,
     });
 
     if (!uploadResponse.ok) {
-        throw new Error("Upload to LifeOps failed.");
+        throw new Error(`Upload to LifeOps failed (${uploadResponse.status})`);
     }
 
     return {

@@ -35,6 +35,7 @@ class ObservedEvent(BaseModel):
         ge=0,
         le=1,
     )
+    requiresAttention: bool
 
 class PlannedAction(BaseModel):
     type: Literal[
