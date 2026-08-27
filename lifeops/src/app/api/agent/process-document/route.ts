@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import { authFetch } from "@/lib/auth/auth-fetch";
 
 export async function POST(request: Request) {
     try {
@@ -11,7 +10,7 @@ export async function POST(request: Request) {
             throw new Error("LIFEOPS_AGENT_API is not configured.");
         }
 
-        const response = await authFetch(`${agentAPI}/process-document`,
+        const response = await fetch(`${agentAPI}/process-document`,
             {
                 method: "POST",
                 headers: {

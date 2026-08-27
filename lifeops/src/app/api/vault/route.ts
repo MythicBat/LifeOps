@@ -1,4 +1,3 @@
-import { authFetch } from "@/lib/auth/auth-fetch";
 import {
   NextResponse,
 } from "next/server";
@@ -23,7 +22,7 @@ export async function GET(request: Request) {
     }
 
     const response =
-      await authFetch(
+      await fetch(
         `${API_URL}/vault`,
         {
           method: "GET",
