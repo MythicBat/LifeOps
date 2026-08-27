@@ -102,8 +102,12 @@ export function Sidebar() {
 
       <div className="mt-auto space-y-1">
         <Link
-          href="/trust"
-          className="flex w-full items-center gap-3 rounded-[14px] px-3 py-2.5 text-sm font-medium text-zinc-500 transition hover:bg-zinc-100 hover:text-zinc-950"
+          href="/trust-centre"
+          className={`flex w-full items-center gap-3 rounded-[14px] px-3 py-2.5 text-sm font-medium transition ${
+            pathname === "/trust-centre"
+              ? "bg-zinc-950 text-white shadow-sm"
+              : "text-zinc-500 hover:bg-zinc-100 hover:text-zinc-950"
+          }`}
         >
           <LockKeyhole size={17} strokeWidth={1.8} />
           Trust Center
@@ -111,7 +115,11 @@ export function Sidebar() {
 
         <Link
           href="/settings"
-          className="flex w-full items-center gap-3 rounded-[14px] px-3 py-2.5 text-sm font-medium text-zinc-500 transition hover:bg-zinc-100 hover:text-zinc-950"
+          className={`flex w-full items-center gap-3 rounded-[14px] px-3 py-2.5 text-sm font-medium transition ${
+            pathname === "/settings"
+              ? "bg-zinc-950 text-white shadow-sm"
+              : "text-zinc-500 hover:bg-zinc-100 hover:text-zinc-950"
+          }`}
         >
           <Settings size={17} strokeWidth={1.8} />
 
