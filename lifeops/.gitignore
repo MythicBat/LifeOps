@@ -44,3 +44,7 @@ agent/.env
 agent/.venv/
 __pycache__/
 *.pyc
+
+# AgentCore deployment project
+LifeOpsAgent/
+

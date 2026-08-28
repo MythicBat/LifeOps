@@ -1,56 +1,179 @@
-import { NextResponse } from "next/server";
+import {
+  BedrockAgentCoreClient,
+  InvokeAgentRuntimeCommand,
+} from "@aws-sdk/client-bedrock-agentcore";
 
-export async function POST(request: Request) {
-    try {
+import {
+  NextResponse,
+} from "next/server";
 
-        const authorization = request.headers.get("authorization");
+import {
+  randomUUID,
+} from "crypto";
 
-        if (!authorization) {
-            return NextResponse.json(
-                {success: false, error: "Authentication required"},
-                {status: 401},
-            );
-        }
 
-        const body = await request.json();
+const region =
+  process.env.AWS_REGION;
 
-        const agentAPI = process.env.LIFEOPS_AGENT_API;
 
-        if (!agentAPI) {
-            throw new Error("LIFEOPS_AGENT_API is not configured.");
-        }
+const client =
+  new BedrockAgentCoreClient({
+    region,
+  });
 
-        const response = await fetch(`${agentAPI}/process-document`,
-            {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: authorization,
-                },
-                body: JSON.stringify(body),
-                cache: "no-store",
-            },
-        );
 
-        const data = await response.json();
+export async function POST(
+  request: Request,
+) {
+  try {
 
-        if (!response.ok) {
-            return NextResponse.json(
-                {
-                    error: "LifeOps agent failed.",
-                    detail: data.detail ?? "Unknown agent error",
-                },
-                {status: response.status}
-            );
-        }
+    const body =
+      await request.json();
 
-        return NextResponse.json(data);
-    } catch (error) {
-        console.error("Agent proxy error:", error);
 
-        return NextResponse.json(
-            {error: "Unable to reach the LifeOps agent."},
-            {status: 500}
-        );
+    const runtimeArn =
+      process.env
+        .LIFEOPS_AGENTCORE_RUNTIME_ARN;
+
+
+    if (!runtimeArn) {
+      throw new Error(
+        "LIFEOPS_AGENTCORE_RUNTIME_ARN is not configured.",
+      );
     }
+
+
+    /*
+     * Later we can replace this
+     * with the authenticated Cognito
+     * user's sub.
+     *
+     * For now the document payload
+     * already contains the LifeOps
+     * information required by the agent.
+     */
+
+    const userId =
+      body.userId ??
+      "lifeops-web-user";
+
+
+    const payload = {
+      action:
+        "process_document",
+
+      userId,
+
+      document: body,
+    };
+
+
+    const command =
+      new InvokeAgentRuntimeCommand({
+        agentRuntimeArn:
+          runtimeArn,
+
+        runtimeSessionId:
+          randomUUID(),
+
+        qualifier:
+          "DEFAULT",
+
+        contentType:
+          "application/json",
+
+        accept:
+          "application/json",
+
+        payload:
+          JSON.stringify(
+            payload,
+          ),
+      });
+
+
+    const response =
+      await client.send(
+        command,
+      );
+
+
+    const responseText =
+      await response.response
+        ?.transformToString();
+
+
+    if (!responseText) {
+      throw new Error(
+        "AgentCore returned an empty response.",
+      );
+    }
+
+
+    let result;
+
+    try {
+      result =
+        JSON.parse(
+          responseText,
+        );
+
+    } catch {
+      console.error(
+        "Invalid AgentCore response:",
+        responseText,
+      );
+
+      throw new Error(
+        "AgentCore returned invalid JSON.",
+      );
+    }
+
+
+    if (
+      result?.success === false
+    ) {
+      return NextResponse.json(
+        {
+          error:
+            result.error ??
+            "LifeOps agent failed.",
+
+          detail:
+            result.detail,
+        },
+        {
+          status: 500,
+        },
+      );
+    }
+
+
+    return NextResponse.json({
+      result,
+    });
+
+  } catch (error) {
+
+    console.error(
+      "AgentCore proxy error:",
+      error,
+    );
+
+
+    return NextResponse.json(
+      {
+        error:
+          "Unable to reach the deployed LifeOps AgentCore runtime.",
+
+        detail:
+          error instanceof Error
+            ? error.message
+            : "Unknown AgentCore error.",
+      },
+      {
+        status: 500,
+      },
+    );
+  }
 }
