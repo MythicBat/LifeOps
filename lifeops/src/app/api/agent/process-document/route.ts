@@ -11,6 +11,10 @@ import {
   randomUUID,
 } from "crypto";
 
+import {
+    awsCredentialsProvider,
+} from "@vercel/oidc-aws-credentials-provider";
+
 
 const region =
   process.env.AWS_REGION;
@@ -19,6 +23,9 @@ const region =
 const client =
   new BedrockAgentCoreClient({
     region,
+    credentials: process.env.AWS_ROLE_ARN ? awsCredentialsProvider({
+        roleArn: process.env.AWS_ROLE_ARN
+    }) : undefined
   });
 
 
