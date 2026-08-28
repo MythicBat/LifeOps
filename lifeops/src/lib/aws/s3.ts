@@ -1,4 +1,5 @@
 import { S3Client } from "@aws-sdk/client-s3";
+import { getAwsCredentials } from "../aws-credentials";
 
 const region = process.env.AWS_REGION;
 
@@ -8,4 +9,5 @@ if (!region) {
 
 export const s3 = new S3Client({
     region,
+    credentials: getAwsCredentials(),
 });

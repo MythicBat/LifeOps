@@ -1,4 +1,5 @@
 import { TextractClient } from "@aws-sdk/client-textract";
+import { getAwsCredentials } from "../aws-credentials";
 
 const region = process.env.AWS_REGION;
 
@@ -6,4 +7,4 @@ if (!region) {
     throw new Error("AWS_REGION is not configured.");
 }
 
-export const textract = new TextractClient({ region });
+export const textract = new TextractClient({ region, credentials: getAwsCredentials(), });
