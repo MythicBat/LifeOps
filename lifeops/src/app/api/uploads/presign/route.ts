@@ -1,7 +1,8 @@
 import { PutObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { NextResponse } from "next/server";
-import { s3, } from "@/lib/aws/s3";
+import { s3 } from "@/lib/aws/s3";
+import { getAuthenticatedUserSub } from "@/lib/server/cognito-auth";
 
 const ACCEPTED_FILE_TYPES = [
     "application/pdf",
@@ -20,12 +21,24 @@ interface PresignRequest {
 
 function sanitiseFileName(fileName: string): string {
     return fileName
-        .trim().replace(/[^a-zA-Z0-9._-]/g, "-")
-        .replace(/-+/g, "-")
+        .trim()
+        .replace(/[^a-zA-Z0-9._-]/g, "-")
+        .replace(/-+/g, "-");
 }
 
 export async function POST(request: Request) {
     try {
+        // Verify the Cognito access token and derive the user identity
+        // server-side. Never trust a userId supplied by the browser.
+        const userSub = await getAuthenticatedUserSub(request);
+
+        if (!userSub) {
+            return NextResponse.json(
+                { error: "Unauthorized." },
+                { status: 401 },
+            );
+        }
+
         const body = (await request.json()) as PresignRequest;
 
         const {
@@ -36,22 +49,22 @@ export async function POST(request: Request) {
 
         if (!fileName || !fileType || typeof fileSize !== "number") {
             return NextResponse.json(
-                {error: "Missing file metadata."},
-                {status: 400},
+                { error: "Missing file metadata." },
+                { status: 400 },
             );
         }
 
         if (!ACCEPTED_FILE_TYPES.includes(fileType)) {
             return NextResponse.json(
-                {error: "Invalid file type."},
-                {status: 400},
+                { error: "Invalid file type." },
+                { status: 400 },
             );
         }
 
-        if (fileSize > MAX_FILE_SIZE) {
+        if (fileSize <= 0 || fileSize > MAX_FILE_SIZE) {
             return NextResponse.json(
-                {error: "File size exceeds the maximum limit."},
-                {status: 400},
+                { error: "File size exceeds the maximum limit." },
+                { status: 400 },
             );
         }
 
@@ -63,7 +76,10 @@ export async function POST(request: Request) {
 
         const documentId = crypto.randomUUID();
         const safeFileName = sanitiseFileName(fileName);
-        const objectKey = `users/demo/intake/${documentId}-${safeFileName}`;
+
+        const objectKey =
+            `users/${userSub}/intake/${documentId}-${safeFileName}`;
+
         const command = new PutObjectCommand({
             Bucket: bucket,
             Key: objectKey,
@@ -74,7 +90,9 @@ export async function POST(request: Request) {
             },
         });
 
-        const uploadUrl = await getSignedUrl(s3, command, { expiresIn: 60 });
+        const uploadUrl = await getSignedUrl(s3, command, {
+            expiresIn: 60,
+        });
 
         return NextResponse.json({
             documentId,
@@ -86,8 +104,8 @@ export async function POST(request: Request) {
         console.error("Presign error:", error);
 
         return NextResponse.json(
-            {error: "Unable to prepare upload."},
-            {status: 500},
+            { error: "Unable to prepare upload." },
+            { status: 500 },
         );
     }
 }
