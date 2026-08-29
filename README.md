@@ -10,7 +10,7 @@ LifeOps turns bills, subscriptions, warranties, renewals, appointments, reminder
 
 <br />
 
-![LifeOps Dashboard](docs/screenshots/dashboard.png)
+![LifeOps Dashboard](lifeops/docs/screenshots/dashboard.png)
 
 <br />
 
@@ -137,7 +137,7 @@ That's the idea behind LifeOps:
 
 The dashboard provides a single view of what currently matters across the user's operational life.
 
-![LifeOps Dashboard](docs/screenshots/dashboard.png)
+![LifeOps Dashboard](lifeops/docs/screenshots/dashboard.png)
 
 It brings together:
 
@@ -158,7 +158,7 @@ Documents shouldn't disappear into a folder five minutes after you download them
 
 The **Life Vault** turns uploaded documents into structured, useful information.
 
-![Life Vault](docs/screenshots/vault.png)
+![Life Vault](lifeops/docs/screenshots/vault.png)
 
 LifeOps can identify and track information such as:
 
@@ -179,7 +179,7 @@ The original document becomes part of a broader operational context rather than 
 
 Autonomous agents become much more interesting when the user gets to decide **how autonomous they actually are**.
 
-![Autonomy Center](docs/screenshots/autonomy.png)
+![Autonomy Center](lifeops/docs/screenshots/autonomy.png)
 
 LifeOps supports three operating modes:
 
@@ -208,7 +208,7 @@ So I didn't.
 
 LifeOps maintains a history of what happened — and what the agent did about it.
 
-![LifeOps Timeline](docs/screenshots/timeline.png)
+![LifeOps Timeline](lifeops/docs/screenshots/timeline.png)
 
 Instead of AI interactions disappearing into individual conversations, LifeOps creates a persistent operational timeline.
 
@@ -221,7 +221,7 @@ Life admin rarely waits until you're sitting at a laptop.
 LifeOps is fully responsive across desktop and mobile.
 
 <p align="center">
-  <img src="docs/screenshots/mobile-dashboard.jpeg" width="280" alt="LifeOps mobile dashboard" />
+  <img src="lifeops/docs/screenshots/mobile-dashboard.jpeg" width="280" alt="LifeOps mobile dashboard" />
   &nbsp;&nbsp;&nbsp;
 </p>
 
@@ -386,7 +386,7 @@ LifeOps combines a Next.js product interface with AWS document intelligence, age
 
 <p align="center">
   <img 
-    src="docs/architecture/lifeops-architecture.png"
+    src="lifeops/docs/architecture/lifeops-architecture.png"
     alt="LifeOps system architecture"
     width="100%"
 </p>
