@@ -24,6 +24,8 @@ LifeOps turns bills, subscriptions, warranties, renewals, appointments, reminder
 
 <br />
 
+### 🚀 [Try the Live Demo](https://life-ops-smoky.vercel.app)
+
 **Observe → Understand → Plan → Guard → Act → Remember**
 
 </div>
@@ -427,6 +429,161 @@ LifeOps combines a Next.js product interface with AWS document intelligence, age
 | **Frontend Hosting** | Vercel |
 | **Backend Hosting** | Render |
 | **Agent Runtime** | Amazon Bedrock AgentCore |
+
+---
+
+# Running LifeOps
+
+LifeOps consists of three main runtime components:
+
+1. the **Next.js web application**
+2. the **FastAPI service layer**
+3. the **Amazon Bedrock AgentCore runtime**
+
+The production system also uses AWS infrastructure including Amazon Cognito, S3, Textract, DynamoDB, EventBridge Scheduler, Lambda, Bedrock, and AgentCore.
+
+## Prerequisites
+
+Before running LifeOps locally, you will need:
+
+- Node.js 20+
+- npm
+- Python 3.12+
+- an AWS account
+- AWS CLI configured for development
+- access to Amazon Bedrock
+- Amazon Cognito
+- Amazon S3
+- Amazon Textract
+- Amazon DynamoDB
+- Amazon EventBridge Scheduler
+- AWS Lambda
+- Amazon Bedrock AgentCore
+
+---
+
+## Frontend
+
+The LifeOps frontend is located in the `lifeops` directory.
+
+Clone the LifeOps frontend repository:
+
+```bash
+git clone https://github.com/MythicBat/LifeOps.git
+```
+
+Install the dependencies:
+
+```bash
+cd lifeops
+npm install
+```
+
+Create a `.env.local` file and configure the required application and AWS resource identifiers:
+
+```env
+AWS_REGION=
+AWS_S3_BUCKET=
+
+NEXT_PUBLIC_COGNITO_USER_POOL_ID=
+NEXT_PUBLIC_COGNITO_CLIENT_ID=
+
+LIFEOPS_AGENT_API=
+LIFEOPS_AGENTCORE_RUNTIME_ARN=
+
+AWS_ROLE_ARN=
+```
+
+Then start the development server:
+
+```bash
+npm run dev
+```
+
+The application will be available at:
+
+```text
+http://localhost:3000
+```
+
+---
+
+## FastAPI Backend
+
+LifeOps uses a Python FastAPI service for dashboard data, persistent LifeOps state, autonomy settings, subscriptions, warranties, renewals, appointments, and other application services.
+
+Create a Python virtual environment:
+
+```bash
+python -m venv .venv
+```
+
+Activate the virtual environment.
+
+**Windows PowerShell:**
+
+```powershell
+.\.venv\Scripts\Activate.ps1
+```
+
+**macOS / Linux:**
+
+```bash
+source .venv/bin/activate
+```
+
+Install the backend dependencies:
+
+```bash
+pip install -r requirements.txt
+```
+
+Configure the backend environment variables for your AWS resources.
+
+The backend requires configuration including:
+
+```env
+AWS_REGION=
+BEDROCK_MODEL_ID=
+
+DYNAMODB_LIFEOBJECTS_TABLE=
+DYNAMODB_OBLIGATIONS_TABLE=
+DYNAMODB_DECISIONS_TABLE=
+DYNAMODB_AGENT_RUNS_TABLE=
+DYNAMODB_SUBSCRIPTIONS_TABLE=
+DYNAMODB_WARRANTIES_TABLE=
+DYNAMODB_RENEWALS_TABLE=
+DYNAMODB_APPOINTMENTS_TABLE=
+
+AGENTCORE_MEMORY_ID=
+```
+
+Additional environment variables may be required depending on which LifeOps services are enabled.
+
+Start the FastAPI development server:
+
+```bash
+uvicorn api:app --reload
+```
+
+---
+
+## Production Deployment
+
+The production LifeOps architecture uses:
+
+| Component | Deployment |
+|---|---|
+| **Web application** | Vercel |
+| **FastAPI backend** | Render |
+| **Autonomous agent** | Amazon Bedrock AgentCore Runtime |
+| **Authentication** | Amazon Cognito |
+| **Document storage** | Amazon S3 |
+| **Document extraction** | Amazon Textract |
+| **Operational state** | Amazon DynamoDB |
+| **Scheduled operations** | Amazon EventBridge Scheduler + AWS Lambda |
+
+In production, the Vercel application accesses AWS through **OIDC federation and temporary AWS credentials** rather than permanent AWS access keys.
 
 ---
 
