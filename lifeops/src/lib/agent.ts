@@ -6,6 +6,7 @@ export interface ObservedEvent {
     title: string;
     summary: string;
     confidence: number;
+    requiresAttention?: boolean;
 }
 
 export interface PlannedAction {
@@ -16,7 +17,7 @@ export interface PlannedAction {
 export interface LifeOpsPlan {
     goal: string;
     riskLevel: "low" | "medium" | "high";
-    requireUser: boolean;
+    requiresUser: boolean;
     actions: PlannedAction[];
     briefing: string;
 }
@@ -31,7 +32,10 @@ export interface ExecutionResult {
     executed: boolean;
     reason?: string;
     results: unknown[];
-    run?: unknown[];
+    run?: {
+        success: boolean;
+        runId?: string;
+    };
 }
 
 export interface AgentProcessingResult {
@@ -39,6 +43,30 @@ export interface AgentProcessingResult {
     plan: LifeOpsPlan;
     guardian: GuardianResult;
     execution: ExecutionResult;
+    
+    autonomy?: {
+        everydayAdmin?: string;
+        money?: string;
+        appointments?: string;
+        subscriptions?: string;
+        documents?: string;
+        warranties?: string;
+        renewals?: string;
+    };
+
+    intelligence?: {
+        subscription?: unknown;
+    };
+}
+
+interface AgentApiResponse {
+  result?: {
+    success?: boolean;
+    result?: AgentProcessingResult;
+  };
+
+  detail?: string;
+  error?: string;
 }
 
 export async function processWithLifeOpsAgent(
@@ -65,11 +93,17 @@ export async function processWithLifeOpsAgent(
         },
     );
 
-    const data = await response.json();
+    const data = (await response.json()) as AgentApiResponse;
 
     if (!response.ok) {
         throw new Error(data.detail ?? data.error ?? "LifeOps agent failed.");
     }
 
-    return data.result;
+    const result = data.result?.result;
+
+    if (!result) {
+        throw new Error("LifeOps agent returned an unexpected response.");
+    }
+
+    return result;
 }
