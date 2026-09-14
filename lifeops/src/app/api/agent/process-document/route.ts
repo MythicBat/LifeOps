@@ -3,17 +3,16 @@ import {
   InvokeAgentRuntimeCommand,
 } from "@aws-sdk/client-bedrock-agentcore";
 
-import {
-  NextResponse,
-} from "next/server";
+import { NextResponse } from "next/server";
+import { randomUUID } from "crypto";
 
 import {
-  randomUUID,
-} from "crypto";
-
-import {
-    awsCredentialsProvider,
+  awsCredentialsProvider,
 } from "@vercel/oidc-aws-credentials-provider";
+
+import {
+  getAuthenticatedUserSub,
+} from "@/lib/server/cognito-auth";
 
 
 const region =
@@ -23,9 +22,13 @@ const region =
 const client =
   new BedrockAgentCoreClient({
     region,
-    credentials: process.env.AWS_ROLE_ARN ? awsCredentialsProvider({
-        roleArn: process.env.AWS_ROLE_ARN
-    }) : undefined
+    credentials:
+      process.env.AWS_ROLE_ARN
+        ? awsCredentialsProvider({
+            roleArn:
+              process.env.AWS_ROLE_ARN,
+          })
+        : undefined,
   });
 
 
@@ -33,6 +36,24 @@ export async function POST(
   request: Request,
 ) {
   try {
+    const userId =
+      await getAuthenticatedUserSub(
+        request,
+      );
+
+
+    if (!userId) {
+      return NextResponse.json(
+        {
+          error:
+            "Authentication required.",
+        },
+        {
+          status: 401,
+        },
+      );
+    }
+
 
     const body =
       await request.json();
@@ -50,28 +71,14 @@ export async function POST(
     }
 
 
-    /*
-     * Later we can replace this
-     * with the authenticated Cognito
-     * user's sub.
-     *
-     * For now the document payload
-     * already contains the LifeOps
-     * information required by the agent.
-     */
-
-    const userId =
-      body.userId ??
-      "lifeops-web-user";
-
-
     const payload = {
       action:
         "process_document",
 
       userId,
 
-      document: body,
+      document:
+        body,
     };
 
 
@@ -119,6 +126,7 @@ export async function POST(
 
     let result;
 
+
     try {
       result =
         JSON.parse(
@@ -161,7 +169,6 @@ export async function POST(
     });
 
   } catch (error) {
-
     console.error(
       "AgentCore proxy error:",
       error,
